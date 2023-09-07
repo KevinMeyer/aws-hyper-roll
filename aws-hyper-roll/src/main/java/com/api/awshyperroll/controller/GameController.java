@@ -22,13 +22,13 @@ public class GameController {
     @PostMapping("/game")
     public Game createNewGame(@RequestBody InitializeGameData gameData) {
         Game game = new Game();
+        
         game.setGameStatus("In Progess...");
         game.setIntialBet(gameData.getBet());
         game.setCurrentRoll(gameData.getBet());
         game.setRolls(new ArrayList<>());
         game.setGameLog(new ArrayList<>());
-        Queue<Player> playersQueue = new LinkedList<>(gameData.getPlayers());
-        game.setPlayers(playersQueue);
+        game.setPlayers(new LinkedList<>(gameData.getPlayers()));
 
         return game;
     }
