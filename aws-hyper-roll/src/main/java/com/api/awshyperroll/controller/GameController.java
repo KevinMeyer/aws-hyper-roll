@@ -26,6 +26,7 @@ public class GameController {
         game.setIntialBet(gameData.getBet());
         game.setCurrentRoll(gameData.getBet());
         game.setRolls(new ArrayList<>());
+        game.setGameLog(new ArrayList<>());
         Queue<Player> playersQueue = new LinkedList<>(gameData.getPlayers());
         game.setPlayers(playersQueue);
 

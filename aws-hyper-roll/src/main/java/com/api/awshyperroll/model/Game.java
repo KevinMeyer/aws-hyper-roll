@@ -11,7 +11,7 @@ public class Game {
     private int currentRoll;
     private Queue<Player> players;
     private List<Roll> rolls;
-    private String rollsString;
+    private List<String> gameLog;
 
     public String getRollsString (){
         String rollsString = "";
@@ -21,9 +21,7 @@ public class Game {
         return rollsString;
     }
 
-    public void setRollsString(String rollsString){
-        this.rollsString = rollsString;
-    }
+    
    
     public Roll roll(){
         // First person in queue is rolling
@@ -36,6 +34,7 @@ public class Game {
             gameStatus = "Player " +  roller.name + " loses!";
         }
         // Add them to the end of the players queue
+        gameLog.add(roller.getName() + " rolled a " + roll + ". \n");
         players.add(roller);
         return newRoll;
     }
