@@ -25,17 +25,19 @@ public class Game {
         this.rollsString = rollsString;
     }
    
-    public void roll(){
+    public Roll roll(){
         // First person in queue is rolling
         Player roller = players.remove();
         int roll =  (int) ((Math.random() * (currentRoll - 1)) + 1);
         currentRoll = roll;
-        rolls.add(new Roll(roller.name, roll));
+        Roll newRoll = new Roll(roller.name, roll);
+        rolls.add(newRoll);
         if (roll == 1) {
             gameStatus = "Player " +  roller.name + " loses!";
         }
         // Add them to the end of the players queue
         players.add(roller);
+        return newRoll;
     }
     
 }
