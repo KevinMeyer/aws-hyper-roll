@@ -14,7 +14,7 @@ public class GameDao {
 
     public GameDao(NamedParameterJdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
-    private static final String INSERT_ROLL = "INSERT INTO db.roll_hist (roll,player_nm) VALUES (:roll, :player_nm); ";
+    private static final String INSERT_ROLL = "INSERT INTO hyperrolldb.roll_hist (roll,player_nm) VALUES (:roll, :player_nm); ";
 
     public void insertRoll (Roll roll) throws DataAccessException{
         SqlParameterSource parameterSource = new MapSqlParameterSource()

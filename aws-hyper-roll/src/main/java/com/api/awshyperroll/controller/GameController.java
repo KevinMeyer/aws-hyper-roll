@@ -4,13 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
-import com.api.awshyperroll.model.Player;
 import com.api.awshyperroll.model.Roll;
 import com.api.awshyperroll.service.GameService;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Queue;
 
 
 @RestController
@@ -22,7 +20,7 @@ public class GameController {
     @PostMapping("/game")
     public Game createNewGame(@RequestBody InitializeGameData gameData) {
         Game game = new Game();
-        
+
         game.setGameStatus("In Progess...");
         game.setIntialBet(gameData.getBet());
         game.setCurrentRoll(gameData.getBet());
@@ -30,6 +28,7 @@ public class GameController {
         game.setGameLog(new ArrayList<>());
         game.setPlayers(new LinkedList<>(gameData.getPlayers()));
 
+        System.out.println("hello");
         return game;
     }
 
