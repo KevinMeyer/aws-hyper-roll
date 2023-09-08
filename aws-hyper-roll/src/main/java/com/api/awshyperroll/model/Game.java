@@ -38,6 +38,7 @@ public class Game {
         // Roller loses if they roll a 1
         if (roll == 1) {
             gameStatus = "FINISHED";
+            gameLog.add(roller.getName() + " rolled a " + roll + ".");
             gameLog.add("Player " +  roller.name + " loses!");
         // If a 1 is not rolled, add them to the back of queue and add the log.
         } else {
