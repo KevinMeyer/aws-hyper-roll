@@ -12,7 +12,12 @@ public class Game {
     private Queue<Player> players;
     private List<Roll> rolls;
     private List<String> gameLog;
+    private String gameLogString;
 
+
+    public String getGameLogString () {
+        return String.join("\n", gameLog);
+    }
     public String getRollsString (){
         String rollsString = "";
         for (Roll roll : rolls) {
@@ -30,12 +35,17 @@ public class Game {
         currentRoll = roll;
         Roll newRoll = new Roll(roller.name, roll);
         rolls.add(newRoll);
+        // Roller loses if they roll a 1
         if (roll == 1) {
-            gameStatus = "Player " +  roller.name + " loses!";
+            gameStatus = "FINISHED";
+            gameLog.add("Player " +  roller.name + " loses!");
+        // If a 1 is not rolled, add them to the back of queue and add the log.
+        } else {
+            gameLog.add(roller.getName() + " rolled a " + roll + ".");
+            players.add(roller);
         }
         // Add them to the end of the players queue
-        gameLog.add(roller.getName() + " rolled a " + roll + ". \n");
-        players.add(roller);
+      
         return newRoll;
     }
     
