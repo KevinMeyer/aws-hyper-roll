@@ -6,6 +6,7 @@ import lombok.Data;
 
 @Data
 public class Game {
+    private String id;
     private String gameStatus;
     private int intialBet;
     private int currentRoll;
@@ -20,22 +21,14 @@ public class Game {
     public String getGameLogString () {
         return String.join("\n", gameLog);
     }
-    public String getRollsString (){
-        String rollsString = "";
-        for (Roll roll : rolls) {
-            rollsString += roll.getPlayer() + " rolled a " + roll.getRoll() + ". \n";
-        }
-        return rollsString;
-    }
-
-    
-   
+  
     public Roll roll(){
         // First person in queue is rolling
         Player roller = players.remove();
         int roll =  (int) ((Math.random() * (currentRoll - 1)) + 1);
         currentRoll = roll;
-        Roll newRoll = new Roll(roller.name, roll);
+        Roll newRoll = new Roll();
+        newRoll.setPlayer(roller.name);
         rolls.add(newRoll);
         // Roller loses if they roll a 1
         if (roll == 1) {
@@ -47,9 +40,6 @@ public class Game {
             gameLog.add(roller.getName() + " rolled a " + roll + ".");
             players.add(roller);
         }
-        // Add them to the end of the players queue
-      
         return newRoll;
     }
-    
 }

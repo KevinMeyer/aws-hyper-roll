@@ -8,26 +8,34 @@
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="/app.js"></script>
 </head>
-<body>
-<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
-    enabled. Please enable
-    Javascript and reload this page!</h2></noscript>
+	<body>
+		<noscript>
+			<h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+				enabled. Please enable Javascript and reload this page!
+			</h2>
+		</noscript>
+		<div id="app-container" style="padding-left: 10px;">
+			<h3> AWS Hyper Roll MVP</h3>
+			<div id="home-menu" style="padding-left: 10px; display: block ;">
+				<button id="bot-game-btn" class="block-btn" onclick="botGameBtnClick();">Play AWS Bot</button><br><br>
+				<button class="block-btn">Create Lobby</button><br><br>
+				<button class="block-btn">Join Lobby</button><br><br>
+			</div>
 
-<div id="main-content" style="padding-left: 10px;">
-	<h3> AWS Hyper Roll MVP</h3>
-	<input type="text" size="10" id="name-input" placeholder="Player Name">
-	<input type="text" size="10" id="bet-input" placeholder="Bet">
-    <button id="create-game" onclick="createGame();">Create Game</button> 
-	<br>
-	<br>
-	<textarea rows="10" cols="45" id="game-log"></textarea> 
-	<br>
-	<br>
-	<button id="roll-button" onclick="roll();" disabled>Roll!</button>
-
-
-</div>
-</body>
+			<div id="bot-game" style="display: none;" class="game-container">
+				<input type="text" size="10" id="name-input" placeholder="Player Name">
+				<input type="text" size="10" id="bet-input" placeholder="Bet">
+				<button id="create-game" onclick="createGame();">Create Game</button> 
+				<br>
+				<br>
+				<textarea rows="10" cols="45" id="game-log"></textarea> 
+				<br>
+				<br>
+				<button id="roll-button" onclick="roll();" disabled>Roll!</button><br><br>			
+				<button id="home-btn"class="block-btn" onclick="homeBtnClick();">Home</button>
+			</div>
+		</div>
+	</body>
 </html>
 
 <script>
@@ -35,34 +43,34 @@
     
 	function createGame() {
 		var game = {
-						"players": [
+						'players': [
 							{
-								"name": $('#name-input').val()
+								'name': $('#name-input').val()
 							},
 							{
-								"name": "AWS Bot"
+								'name': 'AWS Bot'
 							}
 						],
-						"bet": $('#bet-input').val()
+						'bet': $('#bet-input').val()
 					};
 		
 		$.ajax({
-			type:"POST",
+			type:'POST',
 			url:'/game',
 			data:JSON.stringify(game),
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
 			success: function(data){apiSuccess(data);},
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
 	function roll (){
 		$.ajax({
-			type:"POST",
+			type:'POST',
 			url:'/game/roll',
 			data:JSON.stringify(gameState),
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
 			success: function(data){apiSuccess(data);},
     		error: function(errMsg) {alert('Something broke :(');}
 		});
@@ -72,11 +80,21 @@
 		var gameLogInput = $('#game-log');
 		gameLogInput.val(gameState.gameLogString);
 		gameLogInput.scrollTop(gameLogInput[0].scrollHeight);
-		$("#roll-button").html('Player ' + gameState.players[0].name + "'s roll!");
+		$('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
 		if(gameState.gameStatus === 'PLAYING') {
-			$("#roll-button").removeAttr("disabled");
+			$('#roll-button').removeAttr('disabled');
 		} else {
-			$("#roll-button").attr("disabled", true);;
+			$('#roll-button').attr('disabled', true);;
 		}
+	}
+
+	function botGameBtnClick(){
+		$('#bot-game').show();
+		$('#home-menu').hide();
+	}
+	function homeBtnClick(){
+		$('#home-menu').show();		
+		$('.game-container').hide();
+
 	}
 </script>

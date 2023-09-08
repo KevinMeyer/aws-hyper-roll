@@ -1,0 +1,14 @@
+.block-btn {
+    display: block;
+    width: 50%;
+    border: none;
+    padding: 14px 28px;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .block-btn:hover {
+    background-color: #ddd;
+    color: black;
+  }
