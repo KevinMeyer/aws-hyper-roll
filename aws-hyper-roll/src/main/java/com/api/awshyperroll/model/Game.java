@@ -12,6 +12,8 @@ public class Game {
     private Queue<Player> players;
     private List<Roll> rolls;
     private List<String> gameLog;
+    @SuppressWarnings("unused")
+    // Field is used in method overriding lombok getter
     private String gameLogString;
 
 
