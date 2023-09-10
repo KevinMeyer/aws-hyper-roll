@@ -4,5 +4,9 @@ import lombok.Data;
 
 @Data
 public class Player {
-    String name;
+    
+    private String playerId;
+    private String role;
+    private String name;
+
 }

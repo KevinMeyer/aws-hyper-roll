@@ -1,6 +1,7 @@
 package com.api.awshyperroll.dao;
 
-public final class DaoConstants {
+public interface DaoConstants {
+    // SQL Constants 
     
     // Game columns
     public static final String GAME_ID = "game_id";
@@ -13,6 +14,11 @@ public final class DaoConstants {
     public static final String CODE = "code";
     public static final String LOBBY_JSON = "lobby_json";
     public static final String ACTV_FLAG = "actv_flag";
+
+    //player columns 
+    public static final String PLAYER_ID = "player_id";
+    public static final String PLAYER_JSON = "player_json";
+    public static final String HAS_LATEST_GAME = "has_latest_game";
 
     
 }

@@ -8,8 +8,9 @@ import lombok.Data;
 @Data
 public class Game {
     private String gameId;
+    private String lobbyId;
     private String gameStatus;
-    private int intialBet;
+    private int intialRoll;
     private int currentRoll;
     private Queue<Player> players;
     private List<Roll> rolls;
@@ -29,13 +30,13 @@ public class Game {
         int roll =  ThreadLocalRandom.current().nextInt(1, currentRoll);
         currentRoll = roll;
         Roll newRoll = new Roll();
-        newRoll.setPlayer(roller.name);
+        newRoll.setPlayer(roller.getName());
         rolls.add(newRoll);
         // Roller loses if they roll a 1
         if (roll == 1) {
             gameStatus = "FINISHED";
             gameLog.add(roller.getName() + " rolled a " + roll + ".");
-            gameLog.add("Player " +  roller.name + " loses!");
+            gameLog.add("Player " +  roller.getName() + " loses!");
         // If a 1 is not rolled, add them to the back of queue and add the log.
         } else {
             gameLog.add(roller.getName() + " rolled a " + roll + ".");

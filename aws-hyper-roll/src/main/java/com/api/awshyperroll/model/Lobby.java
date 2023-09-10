@@ -7,5 +7,5 @@ public class Lobby {
     private String lobbyId;
     private String gameId;
     private String code;
-    private Game initGame;
+    private Player player;
 }

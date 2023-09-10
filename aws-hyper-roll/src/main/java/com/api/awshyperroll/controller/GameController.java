@@ -12,6 +12,7 @@ import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
 import com.api.awshyperroll.model.Roll;
 import com.api.awshyperroll.service.GameService;
+import com.api.awshyperroll.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 
@@ -23,6 +24,9 @@ public class GameController {
     @Autowired
     private GameService gameService; 
 
+    @Autowired 
+    private LobbyService lobbyService;
+
     @PostMapping("/game")
     public Game createNewGame(@RequestBody InitializeGameData gameData) {
         try {
@@ -30,6 +34,7 @@ public class GameController {
             Game game =  gameService.createGame(gameData);
             game.getGameLog().add("Press Start Game to roll!");
             game.setGameStatus("PLAYING");
+            LOGGER.info("Finished creating Game...");
             return game;
         } catch (JsonProcessingException jpe) {
             String message = "JSON Parse failed when creating new Game";
@@ -50,6 +55,7 @@ public class GameController {
             Roll roll = serverGame.roll();
             gameService.insertRoll(roll);
             gameService.updateGame(serverGame);
+            LOGGER.info("Finished rolling...");
             return serverGame;
         } catch (JsonProcessingException jpe) {
             String message = "JSON Parse failed when creating new Game";
@@ -78,29 +84,21 @@ public class GameController {
         }
     }
 
-    @GetMapping("/game/poll/{gameId}")
-    public Game pollGameState(@PathVariable String gameId){
+    @GetMapping("/game/{gameId}/player/{playerId}")
+    public Game pollGameState(@PathVariable String gameId, @PathVariable String playerId){
         try {
-            LOGGER.info("Begin polling GameState for " + gameId + "..." );
+            LOGGER.info("Begin polling GameState for player " + playerId );
             // Fetch the intial game from the db and set initial player/rolls counts
-            Game game =  gameService.getGame(gameId);
-            int players = game.getPlayers().size();
-            int rolls = game.getRolls().size(); 
-
             for (int i = 0; i < 40; i++){
-                LOGGER.info("Tick " + i);
-                game = gameService.getGame(gameId);
-                if ("INITIALIZING".equals(game.getGameStatus())) {
-                    game.setGameStatus("PLAYING");
-                    gameService.updateGame(game);
-                    return game;
-                }
-                if( players != game.getPlayers().size() || rolls !=  game.getRolls().size() ){
-                    return game;
+                if(!lobbyService.pollPlayerRefresh(playerId)){
+                    LOGGER.info("Game update found!");
+                    lobbyService.setLatestGameFlag(playerId, true);
+                    return gameService.getGame(gameId);
                 }
                 Thread.sleep(250L);
             }
-            return game;
+            LOGGER.info("No game update found, return latest version of game.");
+            return gameService.getGame(gameId);
         } catch (JsonProcessingException jpe) {
             String message = "JSON Parse failed when creating new Game";
             LOGGER.error( message, jpe);

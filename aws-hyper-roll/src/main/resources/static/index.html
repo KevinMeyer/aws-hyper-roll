@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hyper Roll</title>
+    <title>Death Roll</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
@@ -15,51 +15,53 @@
 			</h2>
 		</noscript>
 		<div id="app-container" style="padding-left: 10px;">
-			<h3> AWS Hyper Roll MVP</h3>
+			<h3> AWS Death Roll MVP</h3>
 			<div id="home-menu" style="display: block ;">
-				<button id="bot-game-btn" class="block-btn" onclick="botGameBtnClick();">Play AWS Bot</button><br><br>
+				<!-- <button id="bot-game-btn" class="block-btn" onclick="botGameBtnClick();">Play AWS Bot</button><br><br> -->
 				<button id="create-lobby-btn" class="block-btn" onclick="createLobbyBtnClick();">Create Lobby</button><br><br>
-				<button class="block-btn">Join Lobby</button><br><br>
+				<button class="block-btn" onclick="joinLobbyBtnClick();">Join Lobby</button>
 			</div>
 
 			<div id="game" style="display: none;" class="game-container">
 				<input type="text" size="10" id="game-name" placeholder="Player Name">
-				<input type="text" size="10" id="game-starting-roll" placeholder="Starting Roll">
-				<button id="create-game" onclick="createGame();">Create Game</button> 
+				<!-- <input type="text" size="10" id="game-starting-roll" placeholder="Starting Roll"> -->
 				<br>
 				<br>
 				<textarea rows="10" cols="45" id="game-log"></textarea> 
 				<br>
 				<br>
-				<button id="roll-button" onclick="roll();" disabled>Roll</button><br><br>			
-				<button id="home-btn"class="block-btn" onclick="homeBtnClick();">Home</button>
+				<button id="roll-button" onclick="roll();">Roll</button><br><br>			
 			</div>
-			<div id="lobby" style="display: none;" class="game-container">
+			<div id="create-lobby" style="display: none;" class="game-container lobby">
 				<input type="text" size="10" id="create-lobby-name" placeholder="Player Name">
 				<input type="text" size="10" id="create-lobby-starting-roll" placeholder="Starting Roll">
-				<button id="create-lobby" onclick="createLobby();" >Create Lobby</button> 
+				<button id="create-lobby" onclick="createLobby();">Create Lobby</button> 
 			</div>
+			<div id="join-lobby" style="display: none;" class="game-container lobby">
+				<input type="text" size="10" id="join-lobby-name" placeholder="Player Name">
+				<input type="text" size="10" id="join-lobby-code" placeholder="Code">
+				<button id="create-lobby" onclick="joinLobby();">Join Lobby</button> 
+			</div>
+			<br>
+			<button id="home-btn"class="block-btn" onclick="homeBtnClick();">Home</button>
 		</div>
 	</body>
 </html>
 
 <script>
 	var gameState;
-	var lobby;
+	var lobbyIds;
 	var polling = false;
 	var firstPoll = true;
+	var playerName;
+	var playerId;
+	var gameId;
 
 	function createGame() {
 		var game = {
-						'players': [
-							{
-								'name': $('#game-name').val()
-							},
-							{
-								'name': 'AWS Bot'
-							}
-						],
-						'bet': $('#game-starting-roll').val()
+						'player':{'name': $('#game-name').val()},
+						'initRoll': $('#game-starting-roll').val(),
+						'botGame': true
 					};
 		
 		$.ajax({
@@ -72,7 +74,6 @@
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
-
 	function getGame(gameId){
 		$.ajax({
 			async:false,
@@ -84,17 +85,16 @@
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
-	
-	function pollGame(gameId){
+	function pollGame(gameId, playerId){
 		$.ajax({
 			type:'GET',
-			url:'/game/poll/' + gameId,
+			url:'/game/' + gameId + '/player/' + playerId,
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
 			success: function(data) {
 								updateGameStatus(data);
-								if( game.gameStatus !== 'FINISHED' ){
-									pollGame(gameId);
+								if( game.gameStatus !== 'FINISHED' && currentScreen === 'GAME'){
+									pollGame(gameId, playerId);
 								}
 
 							},
@@ -103,37 +103,48 @@
 	}
 
 	function createLobby(){
-		var game = {
-						'players': [
-							{
-								'name': $('#create-lobby-name').val()
-							},
-						],
-						'bet': $('#create-lobby-starting-roll').val()
+		name = $('#create-lobby-name').val();
+		var lobby = {
+						'player':{'name': name},
+						'initRoll': $('#create-lobby-starting-roll').val(),
+						'botGame': false
 					};
 		
 		$.ajax({
 			type:'POST',
 			url:'/lobby',
-			data:JSON.stringify(game),
+			data:JSON.stringify(lobby),
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
-			success: function(data){createLobbySuccess(data);},
+			success: function(data){startLobby(data);},
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 
 	
 	}
 
-	function createLobbySuccess(data){
+	function joinLobby(){
+		name = $('#join-lobby-name').val();
+		var player = {
+			'name': name
+		};
+		$.ajax({
+			type:'PATCH',
+			url:'/lobby/join/' + $('#join-lobby-code').val(),
+			data:JSON.stringify(player),
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function(data){startLobby(data);},
+    		error: function(errMsg) {alert('Something broke :(');}
+		});
+	}
+	function startLobby(data){
+		currentScreen = 'GAME';
 		$('#game').show();
-		$('#lobby').hide();
-		$('#game-name').val($('#create-lobby-name').val());
-		$('#game-starting-roll').val($('#create-lobby-starting-roll').val());
-		$('#roll-button').attr('disabled', true);
-		$('#create-game').html('Start Game');
-		lobby = data;
-		pollGame(lobby.gameId);
+		$('.lobby').hide();
+		$('#game-name').val(name);
+		lobbyIds = data;
+		pollGame(lobbyIds.gameId, lobbyIds.playerId);
 	}
 
 	function roll (){
@@ -154,22 +165,30 @@
 		gameLogInput.val(gameState.gameLogString);
 		gameLogInput.scrollTop(gameLogInput[0].scrollHeight);
 		$('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
-		if(gameState.gameStatus === 'PLAYING') {
-			$('#roll-button').removeAttr('disabled');
-		} else {
-			$('#roll-button').attr('disabled', true);
-		}
+		// if(gameState.gameStatus === 'PLAYING') {
+		// 	$('#roll-button').removeAttr('disabled');
+		// } else {
+		// 	$('#roll-button').attr('disabled', true);
+		// }
 	}
 
 	function botGameBtnClick(){
+		currentScreen = 'GAME';
 		$('#game').show();
 		$('#home-menu').hide();
 	}
 	function createLobbyBtnClick(){
-		$('#lobby').show();
+		currentScreen = 'CREATE_LOBBY';
+		$('#create-lobby').show();
+		$('#home-menu').hide();
+	}
+	function joinLobbyBtnClick(){
+		currentScreen = 'JOIN_LOBBY';
+		$('#join-lobby').show();
 		$('#home-menu').hide();
 	}
 	function homeBtnClick(){
+		currentScreen = 'HOME';
 		$('#home-menu').show();		
 		$('.game-container').hide();
 	}
