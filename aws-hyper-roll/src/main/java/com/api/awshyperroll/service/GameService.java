@@ -23,12 +23,10 @@ public class GameService {
 
         Game game = new Game();
 
-        game.setGameStatus("PLAYING");
         game.setIntialBet(gameData.getBet());
         game.setCurrentRoll(gameData.getBet());
         game.setRolls(new ArrayList<>());
         List<String> log = new ArrayList<>();
-        log.add("The game has begun with a bet of " + gameData.getBet() + " points!");
         game.setGameLog(log);
         game.setPlayers(new LinkedList<>(gameData.getPlayers()));
         // Creates game with unique UUID in database 

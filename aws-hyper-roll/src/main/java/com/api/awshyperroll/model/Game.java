@@ -1,12 +1,13 @@
 package com.api.awshyperroll.model;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Data;
 
 @Data
 public class Game {
-    private String id;
+    private String gameId;
     private String gameStatus;
     private int intialBet;
     private int currentRoll;
@@ -25,7 +26,7 @@ public class Game {
     public Roll roll(){
         // First person in queue is rolling
         Player roller = players.remove();
-        int roll =  (int) ((Math.random() * (currentRoll - 1)) + 1);
+        int roll =  ThreadLocalRandom.current().nextInt(1, currentRoll);
         currentRoll = roll;
         Roll newRoll = new Roll();
         newRoll.setPlayer(roller.name);

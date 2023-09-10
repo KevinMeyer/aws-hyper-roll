@@ -19,33 +19,35 @@ public class GameDao {
 
     private static final String GET_UUID = "SELECT UUID()";
     private static final String INSERT_ROLL = "INSERT INTO hyperrolldb.roll_hist (roll, player_nm) VALUES (:roll, :player_nm)";
-    private static final String INSERT_GAME = "INSERT INTO hyperrolldb.game (id, json) VALUES (:id, :json)";
-    private static final String GET_GAME = "SELECT json FROM hyperrolldb.game g WHERE g.id = :id ";
-    private static final String UPDATE_GAME = "UPDATE hyperrolldb.game SET json = :json WHERE id = :id";
+    private static final String INSERT_GAME = "INSERT INTO hyperrolldb.game (game_id, game_json) VALUES (:game_id, :game_json)";
+    private static final String GET_GAME = "SELECT game_json FROM hyperrolldb.game g WHERE g.game_id = :game_id ";
+    private static final String UPDATE_GAME = "UPDATE hyperrolldb.game SET game_json = :game_json WHERE game_id = :game_id";
+
+  
+
 
     public void createGame(Game game) throws JsonProcessingException, DataAccessException {
         String id = getUUID();
-        game.setId(id);
+        game.setGameId(id);
         String gameJSON = mapper.writeValueAsString(game);
         SqlParameterSource source = new MapSqlParameterSource()
-            .addValue("id", id)
-            .addValue("json", gameJSON);
+            .addValue(DaoConstants.GAME_ID, id)
+            .addValue(DaoConstants.GAME_JSON, gameJSON);
         jdbcTemplate.update(INSERT_GAME, source);
     }
 
     public void updateGame(Game game) throws JsonProcessingException, DataAccessException {
         String gameJSON = mapper.writeValueAsString(game);
         SqlParameterSource source = new MapSqlParameterSource()
-            .addValue("id", game.getId())
-            .addValue("json", gameJSON);
+            .addValue(DaoConstants.GAME_ID, game.getGameId())
+            .addValue(DaoConstants.GAME_JSON, gameJSON);
         jdbcTemplate.update(UPDATE_GAME, source);
 
     }
     public Game getGame(String id) throws JsonProcessingException, DataAccessException {
         SqlParameterSource source = new MapSqlParameterSource()
-            .addValue("id", id); 
+            .addValue(DaoConstants.GAME_ID, id); 
         String gameJSON = jdbcTemplate.queryForObject(GET_GAME, source, String.class);
-        ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(gameJSON, Game.class);
     }
 
@@ -54,10 +56,9 @@ public class GameDao {
     }
     public void insertRoll (Roll roll) throws DataAccessException{
         SqlParameterSource parameterSource = new MapSqlParameterSource()
-            .addValue("roll", roll.getRoll())
-            .addValue("player_nm", roll.getPlayer());
+            .addValue(DaoConstants.ROLL, roll.getRoll())
+            .addValue(DaoConstants.PLAYER_NM, roll.getPlayer());
 
             jdbcTemplate.update(INSERT_ROLL, parameterSource);
     }
-
 }

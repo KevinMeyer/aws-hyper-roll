@@ -26,8 +26,11 @@ public class GameController {
     @PostMapping("/game")
     public Game createNewGame(@RequestBody InitializeGameData gameData) {
         try {
-            LOGGER.info("Begin creating game...");
-             return gameService.createGame(gameData);
+            LOGGER.info("Begin creating Game...");
+            Game game =  gameService.createGame(gameData);
+            game.getGameLog().add("Press Start Game to roll!");
+            game.setGameStatus("PLAYING");
+            return game;
         } catch (JsonProcessingException jpe) {
             String message = "JSON Parse failed when creating new Game";
             LOGGER.error( message, jpe);
@@ -43,7 +46,7 @@ public class GameController {
     public Game roll(@RequestBody Game game){
         try {
             LOGGER.info("Begin rolling...");
-            Game serverGame = gameService.getGame(game.getId()); 
+            Game serverGame = gameService.getGame(game.getGameId()); 
             Roll roll = serverGame.roll();
             gameService.insertRoll(roll);
             gameService.updateGame(serverGame);
@@ -59,6 +62,58 @@ public class GameController {
         }
     } 
 
+    @GetMapping("/game/{gameId}")
+    public Game getGame(@PathVariable String gameId) {
+        try {
+            LOGGER.info("Begin getting Game...");
+            return gameService.getGame(gameId);
+        } catch (JsonProcessingException jpe) {
+            String message = "JSON Parse failed when creating new Game";
+            LOGGER.error( message, jpe);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+        } catch (DataAccessException dae) {
+            String message = "Database error occured while creating new Game";
+            LOGGER.error(message, dae);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
+        }
+    }
 
+    @GetMapping("/game/poll/{gameId}")
+    public Game pollGameState(@PathVariable String gameId){
+        try {
+            LOGGER.info("Begin polling GameState for " + gameId + "..." );
+            // Fetch the intial game from the db and set initial player/rolls counts
+            Game game =  gameService.getGame(gameId);
+            int players = game.getPlayers().size();
+            int rolls = game.getRolls().size(); 
+
+            for (int i = 0; i < 40; i++){
+                LOGGER.info("Tick " + i);
+                game = gameService.getGame(gameId);
+                if ("INITIALIZING".equals(game.getGameStatus())) {
+                    game.setGameStatus("PLAYING");
+                    gameService.updateGame(game);
+                    return game;
+                }
+                if( players != game.getPlayers().size() || rolls !=  game.getRolls().size() ){
+                    return game;
+                }
+                Thread.sleep(250L);
+            }
+            return game;
+        } catch (JsonProcessingException jpe) {
+            String message = "JSON Parse failed when creating new Game";
+            LOGGER.error( message, jpe);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+        } catch (DataAccessException dae) {
+            String message = "Database error occured while creating new Game";
+            LOGGER.error(message, dae);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
+        } catch (InterruptedException ie) {
+            String message = "Error occured while polling for new game state";
+            LOGGER.error(message, ie);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
+        }
+    }
 
 }

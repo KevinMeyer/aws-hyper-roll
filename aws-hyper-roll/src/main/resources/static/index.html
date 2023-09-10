@@ -16,23 +16,28 @@
 		</noscript>
 		<div id="app-container" style="padding-left: 10px;">
 			<h3> AWS Hyper Roll MVP</h3>
-			<div id="home-menu" style="padding-left: 10px; display: block ;">
+			<div id="home-menu" style="display: block ;">
 				<button id="bot-game-btn" class="block-btn" onclick="botGameBtnClick();">Play AWS Bot</button><br><br>
-				<button class="block-btn">Create Lobby</button><br><br>
+				<button id="create-lobby-btn" class="block-btn" onclick="createLobbyBtnClick();">Create Lobby</button><br><br>
 				<button class="block-btn">Join Lobby</button><br><br>
 			</div>
 
-			<div id="bot-game" style="display: none;" class="game-container">
-				<input type="text" size="10" id="name-input" placeholder="Player Name">
-				<input type="text" size="10" id="bet-input" placeholder="Bet">
+			<div id="game" style="display: none;" class="game-container">
+				<input type="text" size="10" id="game-name" placeholder="Player Name">
+				<input type="text" size="10" id="game-starting-roll" placeholder="Starting Roll">
 				<button id="create-game" onclick="createGame();">Create Game</button> 
 				<br>
 				<br>
 				<textarea rows="10" cols="45" id="game-log"></textarea> 
 				<br>
 				<br>
-				<button id="roll-button" onclick="roll();" disabled>Roll!</button><br><br>			
+				<button id="roll-button" onclick="roll();" disabled>Roll</button><br><br>			
 				<button id="home-btn"class="block-btn" onclick="homeBtnClick();">Home</button>
+			</div>
+			<div id="lobby" style="display: none;" class="game-container">
+				<input type="text" size="10" id="create-lobby-name" placeholder="Player Name">
+				<input type="text" size="10" id="create-lobby-starting-roll" placeholder="Starting Roll">
+				<button id="create-lobby" onclick="createLobby();" >Create Lobby</button> 
 			</div>
 		</div>
 	</body>
@@ -40,18 +45,21 @@
 
 <script>
 	var gameState;
-    
+	var lobby;
+	var polling = false;
+	var firstPoll = true;
+
 	function createGame() {
 		var game = {
 						'players': [
 							{
-								'name': $('#name-input').val()
+								'name': $('#game-name').val()
 							},
 							{
 								'name': 'AWS Bot'
 							}
 						],
-						'bet': $('#bet-input').val()
+						'bet': $('#game-starting-roll').val()
 					};
 		
 		$.ajax({
@@ -60,10 +68,74 @@
 			data:JSON.stringify(game),
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
-			success: function(data){apiSuccess(data);},
+			success: function(data){updateGameStatus(data);},
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
+
+	function getGame(gameId){
+		$.ajax({
+			async:false,
+			type:'GET',
+			url:'/game/' + gameId,
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function(data){updateGameStatus(data);},
+    		error: function(errMsg) {alert('Something broke :(');}
+		});
+	}
+	
+	function pollGame(gameId){
+		$.ajax({
+			type:'GET',
+			url:'/game/poll/' + gameId,
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function(data) {
+								updateGameStatus(data);
+								if( game.gameStatus !== 'FINISHED' ){
+									pollGame(gameId);
+								}
+
+							},
+    		error: function(errMsg) {alert('Something broke :(');}
+		});
+	}
+
+	function createLobby(){
+		var game = {
+						'players': [
+							{
+								'name': $('#create-lobby-name').val()
+							},
+						],
+						'bet': $('#create-lobby-starting-roll').val()
+					};
+		
+		$.ajax({
+			type:'POST',
+			url:'/lobby',
+			data:JSON.stringify(game),
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function(data){createLobbySuccess(data);},
+    		error: function(errMsg) {alert('Something broke :(');}
+		});
+
+	
+	}
+
+	function createLobbySuccess(data){
+		$('#game').show();
+		$('#lobby').hide();
+		$('#game-name').val($('#create-lobby-name').val());
+		$('#game-starting-roll').val($('#create-lobby-starting-roll').val());
+		$('#roll-button').attr('disabled', true);
+		$('#create-game').html('Start Game');
+		lobby = data;
+		pollGame(lobby.gameId);
+	}
+
 	function roll (){
 		$.ajax({
 			type:'POST',
@@ -71,11 +143,12 @@
 			data:JSON.stringify(gameState),
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
-			success: function(data){apiSuccess(data);},
+			success: function(data){updateGameStatus(data);},
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
-	function apiSuccess (data){
+
+	function updateGameStatus (data){
 		gameState = data;
 		var gameLogInput = $('#game-log');
 		gameLogInput.val(gameState.gameLogString);
@@ -84,17 +157,22 @@
 		if(gameState.gameStatus === 'PLAYING') {
 			$('#roll-button').removeAttr('disabled');
 		} else {
-			$('#roll-button').attr('disabled', true);;
+			$('#roll-button').attr('disabled', true);
 		}
 	}
 
 	function botGameBtnClick(){
-		$('#bot-game').show();
+		$('#game').show();
+		$('#home-menu').hide();
+	}
+	function createLobbyBtnClick(){
+		$('#lobby').show();
 		$('#home-menu').hide();
 	}
 	function homeBtnClick(){
 		$('#home-menu').show();		
 		$('.game-container').hide();
-
 	}
+
+
 </script>
