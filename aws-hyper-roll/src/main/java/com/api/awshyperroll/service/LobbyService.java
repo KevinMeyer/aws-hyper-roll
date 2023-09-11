@@ -36,7 +36,7 @@ public class LobbyService {
         // Create new game for lobby
         Game game = gameService.createGame(data);
         // Add log to game
-        game.getGameLog().add("Lobby " + code + " created. Starting Roll:" + game.getIntialRoll());
+        game.getGameLog().add("Created Lobby: " + code + ". Starting Roll:" + game.getIntialRoll());
         game.setGameStatus("INITIALIZING");
         // Create lobby for game 
         Lobby lobby =  lobbyDao.createLobby(game, code);

@@ -49,13 +49,13 @@
 </html>
 
 <script>
+	var currentScreen = 'HOME';
+	
 	var gameState;
 	var lobbyIds;
-	var polling = false;
-	var firstPoll = true;
-	var playerName;
-	var playerId;
-	var gameId;
+
+	var numberOfPolls = 0;
+	
 
 	function createGame() {
 		var game = {
@@ -85,22 +85,7 @@
     		error: function(errMsg) {alert('Something broke :(');}
 		});
 	}
-	function pollGame(gameId, playerId){
-		$.ajax({
-			type:'GET',
-			url:'/game/' + gameId + '/player/' + playerId,
-			contentType: 'application/json; charset=utf-8',
-			dataType: 'json',
-			success: function(data) {
-								updateGameStatus(data);
-								if( game.gameStatus !== 'FINISHED' && currentScreen === 'GAME'){
-									pollGame(gameId, playerId);
-								}
-
-							},
-    		error: function(errMsg) {alert('Something broke :(');}
-		});
-	}
+	
 
 	function createLobby(){
 		name = $('#create-lobby-name').val();
@@ -147,6 +132,29 @@
 		pollGame(lobbyIds.gameId, lobbyIds.playerId);
 	}
 
+	function pollGame(gameId, playerId){
+		$.ajax({
+			type:'GET',
+			url:'/game/' + gameId + '/player/' + playerId,
+			contentType: 'application/json; charset=utf-8',
+			dataType: 'json',
+			success: function(data) {
+								updateGameStatus(data);
+								if(numberOfPolls > 60 ) {
+									alert('Game timed out after ten minutes!');
+									console.log('Timed Out');
+								} else if( gameState.gameStatus !== 'FINISHED' && currentScreen === 'GAME'){
+									numberOfPolls++;
+									pollGame(gameId, playerId);
+								} else {
+									console.log('Game finised or aborted');
+								}
+
+							},
+    		error: function(errMsg) {alert('Something broke :(');}
+		});
+	}
+
 	function roll (){
 		$.ajax({
 			type:'POST',
@@ -189,6 +197,7 @@
 	}
 	function homeBtnClick(){
 		currentScreen = 'HOME';
+		numberOfPolls = 0;
 		$('#home-menu').show();		
 		$('.game-container').hide();
 	}
