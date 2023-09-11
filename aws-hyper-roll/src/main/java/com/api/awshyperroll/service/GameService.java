@@ -24,7 +24,7 @@ public class GameService {
 
         Game game = new Game();
 
-        game.setIntialRoll(gameData.getInitRoll());
+        game.setInitialRoll(gameData.getInitRoll());
         game.setCurrentRoll(gameData.getInitRoll());
         game.setRolls(new ArrayList<>());
        

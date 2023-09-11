@@ -36,7 +36,7 @@ public class LobbyService {
         // Create new game for lobby
         Game game = gameService.createGame(data);
         // Add log to game
-        game.getGameLog().add("Created Lobby: " + code + ". Starting Roll:" + game.getIntialRoll());
+        game.getGameLog().add("Created Lobby: " + code + ". Starting Roll:" + game.getInitialRoll());
         game.setGameStatus("INITIALIZING");
         // Create lobby for game 
         Lobby lobby =  lobbyDao.createLobby(game, code);
@@ -78,5 +78,9 @@ public class LobbyService {
 
     public void setLatestGameFlag(String playerId, boolean flag){
         lobbyDao.setLatestGameFlag(playerId, flag);
+    }
+
+    public void changeLobbyActvFlag(String gameId, boolean flag){
+        lobbyDao.changeLobbyActvFlag(gameId, flag);
     }
 }

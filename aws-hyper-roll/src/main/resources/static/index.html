@@ -23,14 +23,13 @@
 			</div>
 
 			<div id="game" style="display: none;" class="game-container">
-				<input type="text" size="10" id="game-name" placeholder="Player Name">
+				Player Name:&nbsp<span id="player-game-name"></span>
 				<!-- <input type="text" size="10" id="game-starting-roll" placeholder="Starting Roll"> -->
 				<br>
+				<textarea rows="10" cols="45" id="game-log" readonly></textarea> 
 				<br>
-				<textarea rows="10" cols="45" id="game-log"></textarea> 
 				<br>
-				<br>
-				<button id="roll-button" onclick="roll();">Roll</button><br><br>			
+				<button id="roll-button" onclick="roll();">Roll</button><br>		
 			</div>
 			<div id="create-lobby" style="display: none;" class="game-container lobby">
 				<input type="text" size="10" id="create-lobby-name" placeholder="Player Name">
@@ -39,7 +38,7 @@
 			</div>
 			<div id="join-lobby" style="display: none;" class="game-container lobby">
 				<input type="text" size="10" id="join-lobby-name" placeholder="Player Name">
-				<input type="text" size="10" id="join-lobby-code" placeholder="Code">
+				<input type="text" size="4" id="join-lobby-code" placeholder="Code" onkeydown="return /[a-z]/i.test(event.key)">
 				<button id="create-lobby" onclick="joinLobby();">Join Lobby</button> 
 			</div>
 			<br>
@@ -57,38 +56,38 @@
 	var numberOfPolls = 0;
 	
 
-	function createGame() {
-		var game = {
-						'player':{'name': $('#game-name').val()},
-						'initRoll': $('#game-starting-roll').val(),
-						'botGame': true
-					};
+	// function createGame() {
+	// 	var game = {
+	// 					'player':{'name': $('#player-game-name').val()},
+	// 					'initRoll': $('#game-starting-roll').val(),
+	// 					'botGame': true
+	// 				};
 		
-		$.ajax({
-			type:'POST',
-			url:'/game',
-			data:JSON.stringify(game),
-			contentType: 'application/json; charset=utf-8',
-			dataType: 'json',
-			success: function(data){updateGameStatus(data);},
-    		error: function(errMsg) {alert('Something broke :(');}
-		});
-	}
-	function getGame(gameId){
-		$.ajax({
-			async:false,
-			type:'GET',
-			url:'/game/' + gameId,
-			contentType: 'application/json; charset=utf-8',
-			dataType: 'json',
-			success: function(data){updateGameStatus(data);},
-    		error: function(errMsg) {alert('Something broke :(');}
-		});
-	}
+	// 	$.ajax({
+	// 		type:'POST',
+	// 		url:'/game',
+	// 		data:JSON.stringify(game),
+	// 		contentType: 'application/json; charset=utf-8',
+	// 		dataType: 'json',
+	// 		success: function(data){updateGameStatus(data);},
+    // 		error: function(errMsg) {alert('Something broke :(');}
+	// 	});
+	// }
+	// function getGame(gameId){
+	// 	$.ajax({
+	// 		async:false,
+	// 		type:'GET',
+	// 		url:'/game/' + gameId,
+	// 		contentType: 'application/json; charset=utf-8',
+	// 		dataType: 'json',
+	// 		success: function(data){updateGameStatus(data);},
+    // 		error: function(errMsg) {alert('Something broke :(');}
+	// 	});
+	// }
 	
 
 	function createLobby(){
-		name = $('#create-lobby-name').val();
+		name = $('#create-lobby-name').val().trim();
 		var lobby = {
 						'player':{'name': name},
 						'initRoll': $('#create-lobby-starting-roll').val(),
@@ -109,7 +108,7 @@
 	}
 
 	function joinLobby(){
-		name = $('#join-lobby-name').val();
+		name = $('#join-lobby-name').val().trim();
 		var player = {
 			'name': name
 		};
@@ -127,7 +126,7 @@
 		currentScreen = 'GAME';
 		$('#game').show();
 		$('.lobby').hide();
-		$('#game-name').val(name);
+		$('#player-game-name').html(name);
 		lobbyIds = data;
 		pollGame(lobbyIds.gameId, lobbyIds.playerId);
 	}
@@ -157,9 +156,8 @@
 
 	function roll (){
 		$.ajax({
-			type:'POST',
-			url:'/game/roll',
-			data:JSON.stringify(gameState),
+			type:'PATCH',
+			url:'/game/roll/' + lobbyIds.gameId,
 			contentType: 'application/json; charset=utf-8',
 			dataType: 'json',
 			success: function(data){updateGameStatus(data);},
@@ -172,12 +170,16 @@
 		var gameLogInput = $('#game-log');
 		gameLogInput.val(gameState.gameLogString);
 		gameLogInput.scrollTop(gameLogInput[0].scrollHeight);
-		$('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
-		// if(gameState.gameStatus === 'PLAYING') {
-		// 	$('#roll-button').removeAttr('disabled');
-		// } else {
-		// 	$('#roll-button').attr('disabled', true);
-		// }
+		// Change button text
+		if(gameState.gameStatus === 'FINISHED') {
+			$('#roll-button').html('GAME OVER');
+			$('#roll-button').attr('disabled', true);
+
+
+		} else {
+			$('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
+			$('#roll-button').attr('disabled', lobbyIds.playerId !== gameState.players[0].playerId);
+		}
 	}
 
 	function botGameBtnClick(){
@@ -201,6 +203,4 @@
 		$('#home-menu').show();		
 		$('.game-container').hide();
 	}
-
-
 </script>

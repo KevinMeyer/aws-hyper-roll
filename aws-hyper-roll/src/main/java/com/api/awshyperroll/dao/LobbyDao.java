@@ -26,15 +26,14 @@ public class LobbyDao implements DaoConstants {
 
     
     private static final String CREATE_LOBBY = "INSERT INTO hyperrolldb.lobby (lobby_id,code,lobby_json,game_id,upd_ts,actv_flag) " + 
-                                                "VALUES (:lobby_id,:code,:lobby_json,:game_id,CURRENT_TIMESTAMP(),1);";
-    private static final String GET_LOBBY = "SELECT lobby_json FROM hyperrolldb.lobby WHERE code = :code AND actv_flag = 1; ";
-    // private static final String UPDATE_LOBBY  = "";
+                                                "VALUES (:lobby_id,:code,:lobby_json,:game_id,CURRENT_TIMESTAMP(),true);";
+    private static final String GET_LOBBY = "SELECT lobby_json FROM hyperrolldb.lobby WHERE code = :code AND actv_flag = true;";
     private static final String CODE_COUNT = "SELECT COUNT(code) FROM hyperrolldb.lobby WHERE code = :code AND actv_flag != 0;";
-
     private static final String CREATE_PLAYER = "INSERT INTO hyperrolldb.player (player_id,lobby_id,player_json) VALUES (:player_id,:lobby_id,:player_json);";
     private static final String POLL_PLAYER_REFRESH = "SELECT has_latest_game FROM hyperrolldb.player WHERE player_id = :player_id";
+    private static final String UPDATE_HAS_LATEST_GAME = "UPDATE hyperrolldb.player SET has_latest_game = :has_latest_game WHERE player_id = :player_id;";
+    private static final String CHANGE_LOBBY_ACTV_FLAG = "UPDATE hyperrolldb.lobby SET actv_flag = :actv_flag WHERE game_id = :game_id;";
 
-    private static final String UPDATE_HAS_LATEST_GAME = "UPDATE hyperrolldb.player SET has_latest_game = :has_latest_game WHERE player_id = :player_id; ";
 
     public Lobby createLobby(Game game, String code) throws JsonProcessingException, DataAccessException {
         String lobbyId = dao.getUUID();
@@ -85,6 +84,15 @@ public class LobbyDao implements DaoConstants {
             .addValue(PLAYER_ID, playerId)
             .addValue(HAS_LATEST_GAME, flag);
         jdbcTemplate.update(UPDATE_HAS_LATEST_GAME, source);
+    }
+
+    public void changeLobbyActvFlag(String gameId, boolean flag){
+        SqlParameterSource source = new MapSqlParameterSource()
+            .addValue( GAME_ID, gameId)
+            .addValue(ACTV_FLAG, flag);
+
+        jdbcTemplate.update(CHANGE_LOBBY_ACTV_FLAG, source);
+
     }
 
     public String generateCode() {

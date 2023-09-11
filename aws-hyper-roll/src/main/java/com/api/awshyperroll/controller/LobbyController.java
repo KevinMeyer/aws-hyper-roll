@@ -55,8 +55,8 @@ public class LobbyController {
     
    
     @PatchMapping("/lobby/join/{lobbyCode}")
-    public LobbyIds joinLobby (@PathVariable String lobbyCode,
-                            @RequestBody Player player){
+    public LobbyIds joinLobby ( @PathVariable String lobbyCode,
+                                @RequestBody Player player ) {
 
         LOGGER.info("Begin joining Lobby...");
         try {

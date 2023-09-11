@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.Constants.GenericConstants;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
 import com.api.awshyperroll.model.Roll;
@@ -33,7 +34,7 @@ public class GameController {
             LOGGER.info("Begin creating Game...");
             Game game =  gameService.createGame(gameData);
             game.getGameLog().add("Press Start Game to roll!");
-            game.setGameStatus("PLAYING");
+            game.setGameStatus(GenericConstants.PLAYING);
             LOGGER.info("Finished creating Game...");
             return game;
         } catch (JsonProcessingException jpe) {
@@ -41,20 +42,26 @@ public class GameController {
             LOGGER.error( message, jpe);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
         } catch (DataAccessException dae) {
-            String message = "Database error occured while creating new Game";
+            String message = "Database error occurred while creating new Game";
             LOGGER.error(message, dae);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }
     }
 
-    @PostMapping("/game/roll")
-    public Game roll(@RequestBody Game game){
+    @PatchMapping("/game/roll/{gameId}")
+    public Game roll(@PathVariable String gameId){
         try {
             LOGGER.info("Begin rolling...");
-            Game serverGame = gameService.getGame(game.getGameId()); 
-            Roll roll = serverGame.roll();
-            gameService.insertRoll(roll);
-            gameService.updateGame(serverGame);
+            Game serverGame = gameService.getGame(gameId); 
+            // Safeguard to only roll if the game is playable
+            if( serverGame.canRoll()) {
+                Roll roll = serverGame.roll();
+                gameService.insertRoll(roll);
+                if (GenericConstants.FINISHED.equals( serverGame.getGameStatus())){
+                    lobbyService.changeLobbyActvFlag(gameId, false);
+                }
+                gameService.updateGame(serverGame);
+            }
             LOGGER.info("Finished rolling...");
             return serverGame;
         } catch (JsonProcessingException jpe) {
@@ -62,7 +69,7 @@ public class GameController {
             LOGGER.error( message, jpe);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
         } catch (DataAccessException dae) {
-            String message = "Database error occured while rolling";
+            String message = "Database error occurred while rolling";
             LOGGER.error(message, dae);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }
@@ -78,7 +85,7 @@ public class GameController {
             LOGGER.error( message, jpe);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
         } catch (DataAccessException dae) {
-            String message = "Database error occured while creating new Game";
+            String message = "Database error occurred while creating new Game";
             LOGGER.error(message, dae);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }
@@ -87,28 +94,28 @@ public class GameController {
     @GetMapping("/game/{gameId}/player/{playerId}")
     public Game pollGameState(@PathVariable String gameId, @PathVariable String playerId){
         try {
-            LOGGER.info("Begin polling GameState for player " + playerId );
-            // Fetch the intial game from the db and set initial player/rolls counts
+            // LOGGER.info("Begin polling GameState for player " + playerId );
+            // Fetch the initial game from the db and set initial player/rolls counts
             for (int i = 0; i < 40; i++){
                 if(!lobbyService.pollPlayerRefresh(playerId)){
-                    LOGGER.info("Game update found!");
+                    // LOGGER.info("Game update found!");
                     lobbyService.setLatestGameFlag(playerId, true);
                     return gameService.getGame(gameId);
                 }
                 Thread.sleep(250L);
             }
-            LOGGER.info("No game update found, return latest version of game.");
+            // LOGGER.info("No game update found, return latest version of game.");
             return gameService.getGame(gameId);
         } catch (JsonProcessingException jpe) {
             String message = "JSON Parse failed when creating new Game";
             LOGGER.error( message, jpe);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message);
         } catch (DataAccessException dae) {
-            String message = "Database error occured while creating new Game";
+            String message = "Database error occurred while creating new Game";
             LOGGER.error(message, dae);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         } catch (InterruptedException ie) {
-            String message = "Error occured while polling for new game state";
+            String message = "Error occurred while polling for new game state";
             LOGGER.error(message, ie);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }
