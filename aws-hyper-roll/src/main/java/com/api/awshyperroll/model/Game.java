@@ -27,7 +27,7 @@ public class Game {
     public Roll roll(){
         // First person in queue is rolling
         Player roller = players.remove();
-        int roll =  ThreadLocalRandom.current().nextInt(1, currentRoll);
+        int roll =  ThreadLocalRandom.current().nextInt(1, currentRoll + 1);
         currentRoll = roll;
         Roll newRoll = new Roll();
         newRoll.setPlayer(roller.getName());
