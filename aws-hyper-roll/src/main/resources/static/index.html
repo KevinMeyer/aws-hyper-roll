@@ -7,6 +7,9 @@
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="/app.js?"></script>
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
 </head>
 	<body>
 		<noscript>
@@ -24,12 +27,14 @@
 
 			<div id="game" style="display: none;" class="game-container">
 				Player Name:&nbsp<span id="player-game-name"></span>
-				<!-- <input type="text" size="10" id="game-starting-roll" placeholder="Starting Roll"> -->
 				<br>
 				<textarea rows="10" cols="45" id="game-log" readonly></textarea> 
 				<br>
 				<br>
-				<button id="roll-button" onclick="roll();">Roll</button><br>		
+				<button id="roll-button" onclick="roll();">Roll</button> &nbsp&nbsp	
+				<button id="play-again-button" onclick="playAgain();" style="display: none;">Play Again?</button><br>		
+				<br>
+						
 			</div>
 			<div id="create-lobby" style="display: none;" class="game-container lobby">
 				<input type="text" size="10" id="create-lobby-name" placeholder="Player Name">

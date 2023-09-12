@@ -21,7 +21,6 @@ public class Game {
     // Field is used in method overriding lombok getter
     private String gameLogString;
 
-
     public String getGameLogString () {
         return String.join("\n", gameLog);
     }
@@ -42,11 +41,12 @@ public class Game {
             gameStatus = GenericConstants.FINISHED;
             gameLog.add(roller.getName() + " rolled a " + roll + ".");
             gameLog.add("Player " +  roller.getName() + " loses!");
-        // If a 1 is not rolled, add them to the back of queue and add the log.
+        // If a 1 is not rolled, add the log.
         } else {
             gameLog.add(roller.getName() + " rolled a " + roll + ".");
-            players.add(roller);
         }
+        // Always add back to queue so game keeps track of all players for lobby reset 
+        players.add(roller);
         return newRoll;
     }
 

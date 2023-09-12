@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.Constants.GenericConstants;
 import com.api.awshyperroll.dao.GameDao;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
@@ -20,7 +21,7 @@ public class GameService {
     @Autowired
     private GameDao gameDao;
     
-    public Game createGame(InitializeGameData gameData) throws DataAccessException, JsonProcessingException{
+    public Game createGame(InitializeGameData gameData, String lobbyId, String initMessage) throws JsonProcessingException{
 
         Game game = new Game();
 
@@ -29,11 +30,13 @@ public class GameService {
         game.setRolls(new ArrayList<>());
        
         List<String> log = new ArrayList<>();
+        log.add(initMessage);
+        
         game.setGameLog(log);
-       
-        List<Player> initPlayers = new ArrayList<>();
-        initPlayers.add(gameData.getPlayer());
-        game.setPlayers(new LinkedList<>(initPlayers));
+        game.setGameStatus(GenericConstants.INITIALIZING);
+        game.setLobbyId(lobbyId);
+        
+        game.setPlayers(new LinkedList<>(gameData.getPlayers()));
         if(gameData.isBotGame()){
             Player awsBot = new Player();
             awsBot.setName("AWS Bot");
@@ -44,15 +47,25 @@ public class GameService {
         gameDao.createGame(game);
         return game;
     }
-    public void insertRoll(Roll roll) throws DataAccessException{
+    
+    public void insertRoll(Roll roll) {
         gameDao.insertRoll(roll);
     }
-
-    public Game getGame(String id) throws DataAccessException, JsonProcessingException{
-        return gameDao.getGame(id);
+    
+    public Game getGame(String gameId) throws JsonProcessingException{
+        return gameDao.getGame(gameId);
     }
 
-    public void updateGame(Game game)  throws DataAccessException, JsonProcessingException{
+    public Game getGameByLobbyId(String lobbyId) throws JsonProcessingException{
+        return gameDao.getGameByLobbyId(lobbyId);
+    }
+
+    public void updateGame(Game game)  throws JsonProcessingException{
         gameDao.updateGame(game);
+        pushUpdateToPlayer(game.getLobbyId());
+    }
+    
+    public void pushUpdateToPlayer(String lobbyId) {
+        gameDao.pushUpdateToPlayer(lobbyId);
     }
 }

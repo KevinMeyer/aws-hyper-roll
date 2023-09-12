@@ -33,10 +33,12 @@ public class LobbyDao implements DaoConstants {
     private static final String POLL_PLAYER_REFRESH = "SELECT has_latest_game FROM hyperrolldb.player WHERE player_id = :player_id";
     private static final String UPDATE_HAS_LATEST_GAME = "UPDATE hyperrolldb.player SET has_latest_game = :has_latest_game WHERE player_id = :player_id;";
     private static final String CHANGE_LOBBY_ACTV_FLAG = "UPDATE hyperrolldb.lobby SET actv_flag = :actv_flag WHERE game_id = :game_id;";
+    private static final String UPDATE_LOBBY_GAME_ID = "UPDATE hyperrolldb.lobby SET game_id = :game_id WHERE lobby_id = :lobby_id;";
 
 
-    public Lobby createLobby(Game game, String code) throws JsonProcessingException, DataAccessException {
-        String lobbyId = dao.getUUID();
+
+
+    public Lobby createLobby(Game game, String lobbyId, String code) throws JsonProcessingException, DataAccessException {
         Lobby lobby = new Lobby();
         lobby.setLobbyId(lobbyId);
         lobby.setCode(code);
@@ -88,10 +90,19 @@ public class LobbyDao implements DaoConstants {
 
     public void changeLobbyActvFlag(String gameId, boolean flag){
         SqlParameterSource source = new MapSqlParameterSource()
-            .addValue( GAME_ID, gameId)
+            .addValue(GAME_ID, gameId)
             .addValue(ACTV_FLAG, flag);
 
         jdbcTemplate.update(CHANGE_LOBBY_ACTV_FLAG, source);
+
+    }
+
+    public void updateLobbyGame(String lobbyId, String gameId){
+        SqlParameterSource source = new MapSqlParameterSource()
+                .addValue(LOBBY_ID, lobbyId)
+                .addValue(GAME_ID, gameId);
+        
+        jdbcTemplate.update(UPDATE_LOBBY_GAME_ID, source);
 
     }
 

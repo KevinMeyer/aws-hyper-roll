@@ -6,4 +6,5 @@ import lombok.Data;
 public class LobbyIds {
     private String gameId;
     private String playerId;
+    private String lobbyId;
 }

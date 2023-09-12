@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.Constants.GenericConstants;
 import com.api.awshyperroll.dao.Dao;
 import com.api.awshyperroll.dao.LobbyDao;
 import com.api.awshyperroll.model.Game;
@@ -25,35 +26,42 @@ public class LobbyService {
     @Autowired
     private Dao dao;
 
-    public Lobby createLobby(InitializeGameData data) throws JsonProcessingException, DataAccessException{
+    public LobbyIds createLobby(InitializeGameData data) throws JsonProcessingException {
         //Fetch available lobby code and create host UUID
         String code =  lobbyDao.generateCode();
         String hostPlayerId = dao.getUUID();
+        String lobbyId = dao.getUUID();
+
         
-        data.getPlayer().setPlayerId(hostPlayerId);
-        data.getPlayer().setRole("HOST");
+        Player initPlayer = data.getPlayers().get(0);
+
+        initPlayer.setPlayerId(hostPlayerId);
+        initPlayer.setRole(GenericConstants.HOST);
 
         // Create new game for lobby
-        Game game = gameService.createGame(data);
+        String initMessage = "Created Lobby: " + code + ". Starting Roll:" + data.getInitRoll();
+        Game game = gameService.createGame(data, lobbyId, initMessage );
         // Add log to game
-        game.getGameLog().add("Created Lobby: " + code + ". Starting Roll:" + game.getInitialRoll());
-        game.setGameStatus("INITIALIZING");
         // Create lobby for game 
-        Lobby lobby =  lobbyDao.createLobby(game, code);
-        game.setLobbyId(lobby.getLobbyId());
-        lobby.setPlayer(data.getPlayer());
+        Lobby lobby =  lobbyDao.createLobby(game, lobbyId, code);
+        lobby.setPlayer(initPlayer);
         // Create host player/update game in db
-        lobbyDao.createPlayer(data.getPlayer(), lobby.getLobbyId());
+        lobbyDao.createPlayer(initPlayer,lobbyId);
         gameService.updateGame(game);
 
-        return lobby;
+        LobbyIds ids = new LobbyIds();
+        ids.setGameId(lobby.getGameId());
+        ids.setPlayerId(lobby.getPlayer().getPlayerId());
+        ids.setLobbyId(lobby.getLobbyId());
+
+        return ids;
     }
 
-    public LobbyIds joinLobby (String code, Player player ) throws JsonProcessingException, DataAccessException {
+    public LobbyIds joinLobby (String code, Player player ) throws JsonProcessingException {
         // Create new player
         String playerId = dao.getUUID();
         player.setPlayerId(playerId);
-        player.setRole("PLAYER");
+        player.setRole(GenericConstants.PLAYER);
 
         // Update game with new player and log 
         Lobby lobby = lobbyDao.getLobby(code);
@@ -68,6 +76,7 @@ public class LobbyService {
         LobbyIds lobbyIds = new LobbyIds();
         lobbyIds.setGameId(lobby.getGameId());
         lobbyIds.setPlayerId(playerId);;
+        lobbyIds.setLobbyId(lobby.getLobbyId());
         return lobbyIds;
 
     }
@@ -76,11 +85,15 @@ public class LobbyService {
         return lobbyDao.pollPlayerRefresh(playerId);
     }
 
-    public void setLatestGameFlag(String playerId, boolean flag){
+    public void setLatestGameFlag(String playerId, boolean flag) {
         lobbyDao.setLatestGameFlag(playerId, flag);
     }
 
-    public void changeLobbyActvFlag(String gameId, boolean flag){
+    public void changeLobbyActvFlag(String gameId, boolean flag) {
         lobbyDao.changeLobbyActvFlag(gameId, flag);
+    }
+
+    public void updateLobbyGame(String lobbyId, String gameId) {
+        lobbyDao.updateLobbyGame(lobbyId, gameId);
     }
 }
