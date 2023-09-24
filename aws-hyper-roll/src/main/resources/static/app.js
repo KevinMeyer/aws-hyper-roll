@@ -1,3 +1,17 @@
+window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
+      callback: handleCredentialResponse
+    });
+    google.accounts.id.prompt();
+  };
+
+gapi.load('auth2', function() {
+    gapi.auth2.init({
+      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
+    });
+  });
+
 var currentScreen = 'HOME';
 var playerName; 	
 var gameState;
@@ -84,6 +98,23 @@ function roll (){
     });
 }
 
+function sendMessage (){
+    var gameMessage = {
+        gameId:lobbyIds.gameId,
+        playerId:lobbyIds.playerId,
+        message: $('#message').val()
+    }
+
+    $.ajax({
+        type:'POST',
+        url:'/game/message',
+        data:JSON.stringify(gameMessage),
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){console.log('Message Successful'); $('#message').val('')},
+        error: function(errMsg) {alert('Something broke :(');}
+    });
+}
+
 function playAgain(){
     $.ajax({
         type:'PATCH',
@@ -102,7 +133,7 @@ function leaveLobby(){
     $.ajax({
         type:'POST',
         url:'/lobby/' + lobbyIds.lobbyId + '/player/' + lobbyIds.playerId + '/leave',
-        success: function() { console.log("Reset Successful") },
+        success: function() { console.log("Reset Successful"); },
         error:  function (errMsg) { 
                     alert('Something broke :(');
                     console.error(errMsg) ;
@@ -156,7 +187,7 @@ function homeBtnClick(){
     pollTimeoutLimit = 0;
     $('#home-menu').show();		
     $('.game-container').hide();
-    currentScreen = 'HOME';
+    currentScreen = 'HOME'; 
 
     
-}
+  }

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AwsHyperRollApplication<aws-hyper-roll>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.api.awshyperroll.AwsHyperRollApplication",
+            "projectName": "aws-hyper-roll",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

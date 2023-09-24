@@ -71,6 +71,7 @@ public class LobbyController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }        
     }
+    
 
     @GetMapping("/lobby/{lobbyId}/player/{playerId}")
     public PollingResponse pollLobbyState(@PathVariable String lobbyId, @PathVariable String playerId){

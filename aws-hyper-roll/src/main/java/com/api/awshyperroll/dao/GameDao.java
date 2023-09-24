@@ -1,13 +1,13 @@
 package com.api.awshyperroll.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import com.api.awshyperroll.model.Game;
+import com.api.awshyperroll.model.GameMessage;
 import com.api.awshyperroll.model.Roll;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,5 +73,9 @@ public class GameDao implements DaoConstants{
             .addValue(ROLL, roll.getRoll())
             .addValue(DaoConstants.PLAYER_NM, roll.getPlayer());
         jdbcTemplate.update(INSERT_ROLL, parameterSource);
+    }
+
+    public void postGameMessage ( GameMessage gameMessage) {
+        
     }
 }

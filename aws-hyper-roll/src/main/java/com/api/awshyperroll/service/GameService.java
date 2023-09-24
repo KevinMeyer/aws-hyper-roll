@@ -5,12 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.Constants.GenericConstants;
 import com.api.awshyperroll.dao.GameDao;
 import com.api.awshyperroll.model.Game;
+import com.api.awshyperroll.model.GameMessage;
 import com.api.awshyperroll.model.InitializeGameData;
 import com.api.awshyperroll.model.Player;
 import com.api.awshyperroll.model.Roll;
@@ -67,5 +67,13 @@ public class GameService {
     
     public void pushUpdateToPlayer(String lobbyId) {
         gameDao.pushUpdateToPlayer(lobbyId);
+    }
+
+    public void postGameMessage ( GameMessage gameMessage ) throws JsonProcessingException{
+        Game game = getGame(gameMessage.getGameId());
+        game.addGameLog(gameMessage.getMessage());
+        updateGame(game);
+        
+
     }
 }

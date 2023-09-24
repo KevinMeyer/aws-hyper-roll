@@ -26,9 +26,11 @@
 			</div>
 
 			<div id="game" style="display: none;" class="game-container">
-				Player Name:&nbsp<span id="player-game-name"></span>
+				Player Name: &nbsp<span id="player-game-name"></span>
 				<br>
 				<textarea rows="10" cols="45" id="game-log" readonly></textarea> 
+				<br>
+				<input type ="text" size ="35" placeholder="Send message..." id="message">&nbsp<button id=" message-btn" onclick="sendMessage();">Send</button>
 				<br>
 				<br>
 				<button id="roll-button" onclick="roll();">Roll</button> &nbsp&nbsp	

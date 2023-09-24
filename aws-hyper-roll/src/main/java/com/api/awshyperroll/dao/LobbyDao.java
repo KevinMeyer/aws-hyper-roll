@@ -2,7 +2,6 @@ package com.api.awshyperroll.dao;
 
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,8 +19,7 @@ public class LobbyDao implements DaoConstants {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
-    private Dao dao;
+
     public LobbyDao(NamedParameterJdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
     

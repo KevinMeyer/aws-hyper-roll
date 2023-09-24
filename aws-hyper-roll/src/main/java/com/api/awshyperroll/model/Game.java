@@ -39,15 +39,19 @@ public class Game {
         // Roller loses if they roll a 1
         if (roll == 1) {
             gameStatus = GenericConstants.FINISHED;
-            gameLog.add(roller.getName() + " rolled a " + roll + ".");
-            gameLog.add("Player " +  roller.getName() + " loses!");
+            addGameLog( roller.getName() + " rolled a " + roll + "." );
+           addGameLog( "Player " +  roller.getName() + " loses!" );
         // If a 1 is not rolled, add the log.
         } else {
-            gameLog.add(roller.getName() + " rolled a " + roll + ".");
+            addGameLog( roller.getName() + " rolled a " + roll + ".");
         }
         // Always add back to queue so game keeps track of all players for lobby reset 
         players.add(roller);
         return newRoll;
+    }
+
+    public void addGameLog(String log){
+        gameLog.add(log);
     }
 
     //Can only roll if current roll is greater than 1
