@@ -3,6 +3,7 @@ package com.api.awshyperroll.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.api.awshyperroll.model.EmailDetails;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
 import com.api.awshyperroll.model.LobbyIds;
 import com.api.awshyperroll.model.Player;
 import com.api.awshyperroll.model.PollingResponse;
+import com.api.awshyperroll.service.EmailService;
 import com.api.awshyperroll.service.GameService;
 import com.api.awshyperroll.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +38,23 @@ public class LobbyController {
     @Autowired
     private GameService gameService;
     
+    @Autowired private EmailService emailService;
+ 
+    // Sending a simple Email
+    @PostMapping("/sendMail")
+    public String sendMail(@RequestBody EmailDetails details){
+        try {
+            String status
+                = emailService.sendSimpleMail(details);
+    
+            return status;
+        } catch (Exception e) {
+            LOGGER.error("EMAIL NOT SUCCESSFULLY SENT", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL FAILED", e);
+        }
+    }
+ 
+
     @PostMapping("/lobby")
     public LobbyIds createLobby (@RequestBody InitializeGameData gameData) {
         LOGGER.info("Begin createLobby...");
