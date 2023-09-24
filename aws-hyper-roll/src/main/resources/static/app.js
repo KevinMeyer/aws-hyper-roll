@@ -1,17 +1,3 @@
-window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
-      callback: handleCredentialResponse
-    });
-    google.accounts.id.prompt();
-  };
-
-gapi.load('auth2', function() {
-    gapi.auth2.init({
-      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
-    });
-  });
-
 var currentScreen = 'HOME';
 var playerName; 	
 var gameState;
@@ -190,4 +176,4 @@ function homeBtnClick(){
     currentScreen = 'HOME'; 
 
     
-  }
+}
