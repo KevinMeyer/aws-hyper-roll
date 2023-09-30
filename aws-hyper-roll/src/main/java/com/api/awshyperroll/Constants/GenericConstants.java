@@ -1,4 +1,4 @@
-package com.Constants;
+package com.api.awshyperroll.Constants;
 
 public class GenericConstants {
     // Game Statuses 

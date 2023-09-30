@@ -18,7 +18,7 @@ CREATE TABLE lobby (
 	game_id VARCHAR(36) NOT NULL,
 	lobby_json json NOT NULL,
 	upd_ts TIMESTAMP NOT NULL,
-	actv_flag boolean NOT NULL DEFAULT 1,
+	actv_flag BOOLEAN NOT NULL DEFAULT 1,
 	PRIMARY KEY (lobby_id),
 	FOREIGN KEY (game_id)
 		REFERENCES game(game_id)
@@ -31,7 +31,7 @@ ALTER TABLE lobby ADD INDEX lobby_code_index (code);
 CREATE TABLE player (
 	player_id VARCHAR(36) NOT NULL,
 	lobby_id VARCHAR(36) NOT NULL,
-	has_latest_game boolean NOT NULL DEFAULT 0,
+	has_latest_game BOOLEAN NOT NULL DEFAULT 0,
 	player_json json NOT NULL,
 	PRIMARY KEY (player_id),
 	FOREIGN KEY (lobby_id)
@@ -39,4 +39,21 @@ CREATE TABLE player (
 		ON DELETE CASCADE
 );
 
+CREATE TABLE email_auth (
+	email VARCHAR(320) NOT NULL,
+	code VARCHAR(6) NOT NULL,
+	create_ts TIMESTAMP NOT NULL,
+	PRIMARY KEY (email)
+);
 
+ALTER TABLE email ADD INDEX email_auth_email_index (email);
+
+CREATE TABLE account (
+	account_id VARCHAR(36),
+	email VARCHAR(320),
+	verified BOOLEAN,
+	login_token VARCHAR(36),
+	account_json,
+	PRIMARY KEY (account_id)
+
+);

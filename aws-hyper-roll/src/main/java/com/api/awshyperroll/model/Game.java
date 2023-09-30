@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.Constants.GenericConstants;
+import com.api.awshyperroll.Constants.GenericConstants;
 
 import lombok.Data;
 

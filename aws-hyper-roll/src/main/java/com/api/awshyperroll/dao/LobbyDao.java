@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.Lobby;
 import com.api.awshyperroll.model.Player;
+import com.api.awshyperroll.utility.DeathRollUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -105,34 +106,22 @@ public class LobbyDao implements DaoConstants {
     }
 
     public String generateCode() {
-        String code = createRandomCode();
+        int codeLength = 4;
+        String code = DeathRollUtil.createRandomCode(codeLength);
         boolean validCode = false;
         SqlParameterSource source;
         int count;
         while (!validCode) {
             source = new MapSqlParameterSource()
                 .addValue(DaoConstants.CODE, code);
-           count = jdbcTemplate.queryForObject(CODE_COUNT, source, int.class);
-           if (count == 0){
+            count = jdbcTemplate.queryForObject(CODE_COUNT, source, int.class);
+            if (count == 0){
                 validCode = true;
-           } else {
-                code = createRandomCode();
-           }
+            } else {
+                code = DeathRollUtil.createRandomCode(codeLength);
+            }
         }
-        return code.toUpperCase();
-    }
-
-    private String createRandomCode() {
-        int leftLimit = 97; // letter 'a'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 4;
-        Random random = new Random();
-    
-        String code = random.ints(leftLimit, rightLimit + 1)
-          .limit(targetStringLength)
-          .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-          .toString();
-
         return code;
     }
+
 }

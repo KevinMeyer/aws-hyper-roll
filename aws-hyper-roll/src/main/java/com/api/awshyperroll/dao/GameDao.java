@@ -15,7 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Repository
 public class GameDao implements DaoConstants{
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    
     private static final ObjectMapper mapper = new ObjectMapper();
+
     @Autowired
     private Dao dao;
 

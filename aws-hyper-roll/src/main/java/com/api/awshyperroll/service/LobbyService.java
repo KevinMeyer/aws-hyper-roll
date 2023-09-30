@@ -3,7 +3,7 @@ package com.api.awshyperroll.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.Constants.GenericConstants;
+import com.api.awshyperroll.Constants.GenericConstants;
 import com.api.awshyperroll.dao.Dao;
 import com.api.awshyperroll.dao.LobbyDao;
 import com.api.awshyperroll.model.Game;

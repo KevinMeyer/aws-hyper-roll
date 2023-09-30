@@ -6,6 +6,21 @@ var guestFlag;
 
 var pollTimeoutLimit = 0;
 
+function sendCode(){
+    var email = $('#email').val();
+    var emailDetails = {
+        recipient:email
+    }
+    $.ajax({
+        type:'POST',
+        url:'/account/verifyEmail',
+        data:JSON.stringify(emailDetails),
+        contentType: 'application/json; charset=utf-8',
+        success: function(data){alert('Code Sent!')},
+        error: function(errMsg) {alert('Something broke :(');}
+    })
+}
+
 function createLobby(){
     playerName = $('#create-lobby-name').val().trim();
     var lobby = {
