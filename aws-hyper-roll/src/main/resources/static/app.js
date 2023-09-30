@@ -1,21 +1,8 @@
-window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
-      callback: handleCredentialResponse
-    });
-    google.accounts.id.prompt();
-  };
-
-gapi.load('auth2', function() {
-    gapi.auth2.init({
-      client_id: '765376081304-c2dmooetuerdl59cmh7l16b7m1vesob1.apps.googleusercontent.com',
-    });
-  });
-
-var currentScreen = 'HOME';
+var currentScreen = 'LOGIN';
 var playerName; 	
 var gameState;
 var lobbyIds;
+var guestFlag;
 
 var pollTimeoutLimit = 0;
 
@@ -162,6 +149,32 @@ function updateGameStatus (data){
     }
 }
 
+function loginMenuClick(){
+    $('#login-register-form').show();
+    $('#login-form').show();
+    $('#login-screen').hide();
+}
+
+function registerMenuCLick(){
+    $('#login-register-form').show();
+    $('#register-form').show();
+    $('#login-screen').hide();
+}
+
+function loginBackBtn(){
+    $('#login-screen').show();
+    $('#login-register-form').hide();
+    $('#register-form').hide();
+    $('#login-form').hide();
+
+
+}
+function guestClick(){
+    $('#home-menu').show();	
+    $('#login-screen').hide();
+    currentScreen = 'HOME';
+
+}
 function botGameBtnClick(){
     $('#game').show();
     $('#home-menu').hide();
@@ -170,12 +183,14 @@ function botGameBtnClick(){
 }
 function createLobbyBtnClick(){
     $('#create-lobby').show();
+    $('#game-screens').show();
     $('#home-menu').hide();
     currentScreen = 'CREATE_LOBBY';
 
 }
 function joinLobbyBtnClick(){
     $('#join-lobby').show();
+    $('#game-screens').show();
     $('#home-menu').hide();    
     currentScreen = 'JOIN_LOBBY';
 
@@ -187,7 +202,13 @@ function homeBtnClick(){
     pollTimeoutLimit = 0;
     $('#home-menu').show();		
     $('.game-container').hide();
-    currentScreen = 'HOME'; 
+    $('#game-screens').hide();
+    currentScreen = 'HOME';   
+}
 
-    
-  }
+function logout(){
+    $('#home-menu').hide();		
+    $('#login-screen').show();
+    currentScreen = 'LOGIN';
+
+}
