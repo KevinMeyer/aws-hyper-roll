@@ -52,7 +52,7 @@ CREATE TABLE account (
 	account_id VARCHAR(36),
 	email VARCHAR(320) UNIQUE,
 	pwd_hash VARCHAR(100),
-	login_token VARCHAR(36) UNIQUE,
+	login_token VARCHAR(36),
 	account_json JSON,
 	PRIMARY KEY (account_id)
 
