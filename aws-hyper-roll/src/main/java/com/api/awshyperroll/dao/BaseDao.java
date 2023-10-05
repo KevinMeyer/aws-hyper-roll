@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class Dao {
+public class BaseDao {
     private final NamedParameterJdbcTemplate jdbcTemplate;
-    public Dao(NamedParameterJdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
+    public BaseDao(NamedParameterJdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
     
     private static final String GET_UUID = "SELECT UUID()";
 

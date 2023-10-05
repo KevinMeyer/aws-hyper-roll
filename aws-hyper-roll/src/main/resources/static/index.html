@@ -26,14 +26,16 @@
 				<button id="guest-btn" class="block-btn" onclick="guestClick();">Continue As Guest</button>
 			</div>
 			<div id="login-register-form" style="display: none;">
-				<input id="email" type="text" placeholder="E-Mail Address">&nbsp&nbsp<input type="text" placeholder="Verification Code">
-				&nbsp<button id=" message-btn" onclick="sendCode();">Send</button><br><br>
+				<input id="email" type="text" placeholder="Email Address"><br><br>
+				<input id="password" type="password" placeholder="Password"> <br><br>
 				<div id="login-form" style="display: none;">	
-					<button id="login-btn" class="block-btn" onclick="">Login</button><br><br>
+					<button id="login-btn" class="block-btn" onclick="login();">Login</button><br><br>
 				</div>
 				<div id="register-form" style="display: none;">
-					<input type="text" placeholder="Display Name"><br><br>
-					<button id="register-btn" class="block-btn" onclick="">Register</button><br><br>
+					<input id="reg-name" type="text" placeholder="Display Name" maxlength="20A"><br><br>
+					<input  id="verify-code" type="text" placeholder="Code" maxlength="6">&nbsp&nbsp
+						<button id="send-code-btn" onclick="sendCode();">Send Code</button><br><br>
+					<button id="register-btn" class="block-btn" onclick="register();">Register</button><br><br>
 				</div>
 				<button id="back-btn" class="block-btn" onclick="loginBackBtn();">Back</button>
 
@@ -41,6 +43,7 @@
 			<!-- HOME SCREEN -->
 			<div id="home-menu" style="display: none;">
 				<!-- <button id="bot-game-btn" class="block-btn" onclick="botGameBtnClick();">Play AWS Bot</button><br><br> -->
+				Player Name: <span id="player-display-name"></span>&nbsp&nbsp Credits: <span id="account-credits"></span><br><br>
 				<button id="create-lobby-btn" class="block-btn" onclick="createLobbyBtnClick();">Create Lobby</button><br><br>
 				<button id="join-lobby-btn" class="block-btn" onclick="joinLobbyBtnClick();">Join Lobby</button><br><br>
 				<button id="home-btn"class="block-btn" onclick="logout();">Logout</button>

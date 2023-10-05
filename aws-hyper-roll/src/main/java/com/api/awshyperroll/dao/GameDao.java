@@ -19,7 +19,7 @@ public class GameDao implements DaoConstants{
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private Dao dao;
+    private BaseDao baseDao;
 
     public GameDao(NamedParameterJdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
@@ -33,7 +33,7 @@ public class GameDao implements DaoConstants{
                                                           
 
     public void createGame(Game game) throws JsonProcessingException {
-        String id = dao.getUUID();
+        String id = baseDao.getUUID();
         game.setGameId(id);
         String gameJSON = mapper.writeValueAsString(game);
         SqlParameterSource source = new MapSqlParameterSource()

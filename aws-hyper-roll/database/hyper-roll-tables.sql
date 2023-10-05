@@ -8,7 +8,7 @@ CREATE TABLE roll_hist (
 
 CREATE TABLE game (
 	game_id VARCHAR(36) NOT NULL,
-	game_json json NOT NULL,
+	game_json JSON NOT NULL,
 	PRIMARY KEY (game_id)
 );
 
@@ -16,7 +16,7 @@ CREATE TABLE lobby (
 	lobby_id VARCHAR(36) NOT NULL,
 	code VARCHAR(4) NOT NULL,
 	game_id VARCHAR(36) NOT NULL,
-	lobby_json json NOT NULL,
+	lobby_json JSON NOT NULL,
 	upd_ts TIMESTAMP NOT NULL,
 	actv_flag BOOLEAN NOT NULL DEFAULT 1,
 	PRIMARY KEY (lobby_id),
@@ -32,7 +32,7 @@ CREATE TABLE player (
 	player_id VARCHAR(36) NOT NULL,
 	lobby_id VARCHAR(36) NOT NULL,
 	has_latest_game BOOLEAN NOT NULL DEFAULT 0,
-	player_json json NOT NULL,
+	player_json JSON NOT NULL,
 	PRIMARY KEY (player_id),
 	FOREIGN KEY (lobby_id)
 		REFERENCES lobby(lobby_id)
@@ -46,14 +46,17 @@ CREATE TABLE email_auth (
 	PRIMARY KEY (email)
 );
 
-ALTER TABLE email ADD INDEX email_auth_email_index (email);
+ALTER TABLE email_auth ADD INDEX email_auth_email_index (email);
 
 CREATE TABLE account (
 	account_id VARCHAR(36),
-	email VARCHAR(320),
-	verified BOOLEAN,
-	login_token VARCHAR(36),
-	account_json,
+	email VARCHAR(320) UNIQUE,
+	pwd_hash VARCHAR(100),
+	login_token VARCHAR(36) UNIQUE,
+	account_json JSON,
 	PRIMARY KEY (account_id)
 
 );
+
+ALTER TABLE account ADD INDEX account_email_index (email);
+

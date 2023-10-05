@@ -1,7 +1,5 @@
 package com.api.awshyperroll.dao;
 
-import java.util.Random;
-
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
