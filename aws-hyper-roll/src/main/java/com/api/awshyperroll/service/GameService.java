@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.Constants.GenericConstants;
+import com.api.awshyperroll.Constants.GenericConstants;
 import com.api.awshyperroll.dao.GameDao;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.GameMessage;

@@ -3,8 +3,8 @@ package com.api.awshyperroll.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.Constants.GenericConstants;
-import com.api.awshyperroll.dao.Dao;
+import com.api.awshyperroll.Constants.GenericConstants;
+import com.api.awshyperroll.dao.BaseDao;
 import com.api.awshyperroll.dao.LobbyDao;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
@@ -23,7 +23,7 @@ public class LobbyService {
     private GameService gameService;
 
     @Autowired
-    private Dao dao;
+    private BaseDao dao;
 
     public LobbyIds createLobby(InitializeGameData data) throws JsonProcessingException {
         //Fetch available lobby code and create host UUID

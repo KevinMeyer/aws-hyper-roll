@@ -20,5 +20,11 @@ public interface DaoConstants {
     public static final String PLAYER_JSON = "player_json";
     public static final String HAS_LATEST_GAME = "has_latest_game";
 
+    //account columns 
+    public static final String EMAIL = "email";
+    public static final String PWD_HASH = "pwd_hash";
+    public static final String ACCOUNT_ID = "account_id";
+    public static final String ACCOUNT_JSON = "account_json";
+    public static final String LOGIN_TOKEN = "login_token";
     
 }

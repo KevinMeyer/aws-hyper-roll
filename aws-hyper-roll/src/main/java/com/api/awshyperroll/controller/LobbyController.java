@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.api.awshyperroll.model.EmailDetails;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
 import com.api.awshyperroll.model.LobbyIds;
 import com.api.awshyperroll.model.Player;
 import com.api.awshyperroll.model.PollingResponse;
+import com.api.awshyperroll.service.EmailService;
 import com.api.awshyperroll.service.GameService;
 import com.api.awshyperroll.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,6 +36,18 @@ public class LobbyController {
 
     @Autowired
     private GameService gameService;
+
+    @Autowired 
+    private EmailService emailService;
+
+    @PostMapping("/sendEmail")
+    public void testEmail(@RequestBody EmailDetails details){
+        try {
+            emailService.sendSimpleMail(details);
+        } catch (Exception e) {
+            LOGGER.error("Email didnt work", e);
+        }
+    }
     
     @PostMapping("/lobby")
     public LobbyIds createLobby (@RequestBody InitializeGameData gameData) {

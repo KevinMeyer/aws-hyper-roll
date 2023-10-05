@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.Constants.GenericConstants;
+import com.api.awshyperroll.Constants.GenericConstants;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.GameMessage;
 import com.api.awshyperroll.model.Roll;

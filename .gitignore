@@ -1,1 +1,2 @@
 aws-hyper-roll/src/main/resources/application-local.properties
+/target/**

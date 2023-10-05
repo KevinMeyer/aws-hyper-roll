@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.Constants.GenericConstants;
+import com.api.awshyperroll.Constants.GenericConstants;
 
 import lombok.Data;
 
@@ -34,7 +34,8 @@ public class Game {
         int roll =  ThreadLocalRandom.current().nextInt(1, currentRoll + 1);
         currentRoll = roll;
         Roll newRoll = new Roll();
-        newRoll.setPlayer(roller.getName());
+        newRoll.setPlayer(roller.getPlayerId());
+        newRoll.setRoll(roll);
         rolls.add(newRoll);
         // Roller loses if they roll a 1
         if (roll == 1) {
