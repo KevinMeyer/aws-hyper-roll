@@ -3,6 +3,7 @@ package com.api.awshyperroll.service;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,30 +22,42 @@ public class GameService {
     @Autowired
     private GameDao gameDao;
     
+    public Game resetGame(InitializeGameData gameData, Game oldGame
+                            ,String lobbyId, String initMessage) throws JsonProcessingException {
+        
+        Game game = createNewGame(gameData, lobbyId, initMessage);    
+        game.setPlayers(new LinkedList<>(gameData.getPlayers())); 
+        game.setInitPlayers(oldGame.getInitPlayers());  
+        game.setGameLog(oldGame.getGameLog());
+        game.addGameLog(initMessage);
+        gameDao.createGame(game);
+        return game;
+    }
     public Game createGame(InitializeGameData gameData, String lobbyId, String initMessage) throws JsonProcessingException{
 
+        Game game = createNewGame(gameData, lobbyId, initMessage);
+        // Creates game with unique UUID in database 
+        gameDao.createGame(game);
+        return game;
+    }
+
+    private Game createNewGame(InitializeGameData gameData, String lobbyId, String initMessage){
         Game game = new Game();
 
         game.setInitialRoll(gameData.getInitRoll());
         game.setCurrentRoll(gameData.getInitRoll());
         game.setRolls(new ArrayList<>());
-       
+        game.setEliminationGame(gameData.isEliminationGame());
+    
         List<String> log = new ArrayList<>();
         log.add(initMessage);
+
         
         game.setGameLog(log);
         game.setGameStatus(GenericConstants.INITIALIZING);
         game.setLobbyId(lobbyId);
         
-        game.setPlayers(new LinkedList<>(gameData.getPlayers()));
-        if(gameData.isBotGame()){
-            Player awsBot = new Player();
-            awsBot.setName("AWS Bot");
-            awsBot.setRole("Player");
-            awsBot.setPlayerId("BOT");
-        }
         // Creates game with unique UUID in database 
-        gameDao.createGame(game);
         return game;
     }
     
@@ -71,7 +84,9 @@ public class GameService {
 
     public void postGameMessage ( GameMessage gameMessage ) throws JsonProcessingException{
         Game game = getGame(gameMessage.getGameId());
-        game.addGameLog(gameMessage.getMessage());
+        Player msgSender = game.getInitPlayers().get(gameMessage.getFromPlayerId());
+        String message = msgSender.getName() + ": " + gameMessage.getMessage(); 
+        game.addGameLog(message);
         updateGame(game);
         
 

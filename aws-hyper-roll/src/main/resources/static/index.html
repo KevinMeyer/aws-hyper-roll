@@ -20,25 +20,28 @@
 		<div id="app-container" style="padding-left: 10px;">
 			<h3> AWS Death Roll</h3>
 			<!-- LOGIN SCREEN -->
-			<div id ="login-screen" style="display: block;">
+			<div id ="login-screen" style="display: block;" class ='login-reg-forms'>
 				<button id="login-menu-btn" class="block-btn" onclick="loginMenuClick();">Login</button><br><br>
-				<button id="register-menu-btn" class="block-btn" onclick="registerMenuCLick();">Register</button><br><br>
-				<button id="guest-btn" class="block-btn" onclick="guestClick();">Continue As Guest</button>
+				<button id="register-menu-btn" class="block-btn" onclick="registerMenuClick();">Register</button><br><br>
+				<button id="guest-btn" class="block-btn" onclick="guestMenuClick();">Continue As Guest</button>
 			</div>
-			<div id="login-register-form" style="display: none;">
+			<div id="login-register-form" style="display: none;" class ='login-reg-forms'>
 				<input id="email" type="text" placeholder="Email Address"><br><br>
 				<input id="password" type="password" placeholder="Password"> <br><br>
-				<div id="login-form" style="display: none;">	
+				<div id="login-form" style="display: none;" class ='login-reg-forms'>	
 					<button id="login-btn" class="block-btn" onclick="login();">Login</button><br><br>
 				</div>
-				<div id="register-form" style="display: none;">
-					<input id="reg-name" type="text" placeholder="Display Name" maxlength="20A"><br><br>
+				<div id="register-form" style="display: none;" class ='login-reg-forms'>
+					<input id="reg-name" type="text" placeholder="Display Name" maxlength="20"><br><br>
 					<input  id="verify-code" type="text" placeholder="Code" maxlength="6">&nbsp&nbsp
 						<button id="send-code-btn" onclick="sendCode();">Send Code</button><br><br>
 					<button id="register-btn" class="block-btn" onclick="register();">Register</button><br><br>
 				</div>
 				<button id="back-btn" class="block-btn" onclick="loginBackBtn();">Back</button>
-
+			</div>
+			<div id="guest-form" style="display:none;" class ='login-reg-forms'>	
+				<input id="guest-name" type="text" placeholder="Display Name" maxlength="20"><br><br>
+				<button id="guest-login-btn" class="block-btn" onclick="guestLogin();">Continue</button><br><br>
 			</div>
 			<!-- HOME SCREEN -->
 			<div id="home-menu" style="display: none;">
@@ -60,12 +63,12 @@
 				</div>
 				<!-- LOBBY SCREEN -->
 				<div id="create-lobby" style="display: none;" class="game-container lobby">
-					<input type="text" size="10" id="create-lobby-name" placeholder="Player Name">
-					<input type="text" size="10" id="create-lobby-starting-roll" placeholder="Starting Roll">
+					<input type="text" size="10" id="create-lobby-starting-roll" placeholder="Starting Roll"> &nbsp
+					Elimination Game?&nbsp <input type="checkbox" id="create-lobby-elimination-checkbox" checked> &nbsp
+					Bet Credits?&nbsp <input type="checkbox" id="create-lobby-credit-checkbox" >
 					<button id="create-lobby" onclick="createLobby();">Create Lobby</button> 
 				</div>
 				<div id="join-lobby" style="display: none;" class="game-container lobby">
-					<input type="text" size="10" id="join-lobby-name" placeholder="Player Name">
 					<input type="text" size="4" id="join-lobby-code" placeholder="Code" onkeydown="return /[a-z]/i.test(event.key)">
 					<button id="create-lobby" onclick="joinLobby();">Join Lobby</button> 
 				</div>

@@ -2,7 +2,9 @@ let currentScreen = 'LOGIN';
 let playerName;	
 let gameState;
 let lobbyIds;
-let guestFlag;
+let guestFlag = false;
+
+let account;
 
 let pollTimeoutLimit = 0;
 
@@ -67,11 +69,15 @@ function login(loginCache){
 }
 
 function createLobby(){
-    playerName = $('#create-lobby-name').val().trim();
     const lobby = {
-                    'players':[{'name': playerName}],
+                    'players': [{
+                                    'name': account.displayName, 
+                                    'accountId':account.accountId,
+                                    'guest':guestFlag
+                                }]
+                    ,
                     'initRoll': $('#create-lobby-starting-roll').val(),
-                    'botGame': false
+                    'eliminationGame':$('#create-lobby-elimination-checkbox').is(':checked')
                 };
     
     $.ajax({
@@ -88,9 +94,10 @@ function createLobby(){
 }
 
 function joinLobby(){
-    playerName = $('#join-lobby-name').val().trim();
     const player = {
-        'name': playerName
+        'name': account.displayName,
+        'accountId': account.accountId,
+        'guest':guestFlag
     };
     $.ajax({
         type:'PATCH',
@@ -103,11 +110,13 @@ function joinLobby(){
     });
 }
 function startLobby(data){
+    console.log(data);
     currentScreen = 'GAME';
     $('#game').show();
     $('.lobby').hide();
-    $('#player-game-name').html(playerName);
-    lobbyIds = data;
+    $('#player-game-name').html(account.displayName);
+    const response = data;
+    lobbyIds = response.lobbyIds;
     pollLobby(lobbyIds.lobbyId, lobbyIds.playerId);
 }
 
@@ -147,9 +156,9 @@ function roll (){
 
 function sendMessage (){
     const gameMessage = {
-        gameId:lobbyIds.gameId,
-        playerId:lobbyIds.playerId,
-        message: $('#message').val()
+        'gameId':lobbyIds.gameId,
+        'fromPlayerId':lobbyIds.playerId,
+        'message': $('#message').val()
     }
 
     $.ajax({
@@ -202,17 +211,23 @@ function updateGameStatus (data){
         $('#play-again-button').show();
 
     } else {
-        $('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
-        $('#roll-button').attr('disabled', lobbyIds.playerId !== gameState.players[0].playerId);
+        if (gameState.players.length > 1) {
+            $('#roll-button').html('Player ' + gameState.players[0].name + '\'s roll!');
+            $('#roll-button').attr('disabled', lobbyIds.playerId !== gameState.players[0].playerId);
+        } else {
+            $('#roll-button').attr('disabled',true);   
+        }
+       
         $('#play-again-button').hide();
 
     }
+    
 }
 
 function loginCallback(data){
     const loginResponse = data;
     if (!loginResponse.success) {
-        alert(data.errMsg);
+        alert(loginResponse.errMsg);
         loginBackBtn();
         localStorage.clear();
         return;
@@ -224,12 +239,13 @@ function loginCallback(data){
     } else {
         alert("Sorry! You have no web storage support and your login will not be cached :(");
     }
+    account = loginResponse.account;
     $('#home-menu').show();	
     $('#register-form').hide();
     $('#login-screen').hide();
     $('#login-register-form').hide();
-    $('#player-display-name').text(data.account.displayName);
-    $('#account-credits').text(data.account.credits);
+    $('#player-display-name').text(account.displayName);
+    $('#account-credits').text(account.credits);
 
     currentScreen = 'HOME';
 
@@ -252,7 +268,7 @@ function loginMenuClick(){
 
 }
 
-function registerMenuCLick(){
+function registerMenuClick(){
     $('#login-register-form').show();
     $('#register-form').show();
     $('#login-screen').hide();
@@ -263,12 +279,26 @@ function loginBackBtn(){
     $('#login-register-form').hide();
     $('#register-form').hide();
     $('#login-form').hide();
+    $('#guest-form').hide();
 
 
 }
-function guestClick(){
-    $('#home-menu').show();	
+function guestMenuClick(){
+    $('#guest-form').show();
     $('#login-screen').hide();
+    currentScreen = 'HOME';
+
+}
+function guestLogin(){
+    $('#home-menu').show();	
+    $('#guest-form').hide();
+    account = {
+        displayName: $('#guest-name').val(),
+        credits:'N/A'
+    }
+    $('#player-display-name').text(account.displayName);
+    $('#account-credits').text(account.credits);
+    guestFlag = true;
     currentScreen = 'HOME';
 
 }

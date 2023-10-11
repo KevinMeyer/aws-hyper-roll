@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
-
+@CrossOrigin(origins = "/**", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT}, allowedHeaders = "*")
 @RestController
 public class GameController { 
 
@@ -31,7 +31,7 @@ public class GameController {
     @Autowired 
     private LobbyService lobbyService;
 
-    @CrossOrigin( originPatterns = "*")
+    @CrossOrigin( originPatterns = "/**")
     @PatchMapping("/game/roll/{gameId}")
     public Game roll(@PathVariable String gameId){
         try {
@@ -58,7 +58,7 @@ public class GameController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message );
         }
     } 
-
+    @CrossOrigin( originPatterns = "/**")
     @GetMapping("/game/{gameId}")
     public Game getGame(@PathVariable String gameId) {
         try {

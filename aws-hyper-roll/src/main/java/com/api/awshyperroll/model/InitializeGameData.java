@@ -8,5 +8,6 @@ import lombok.Data;
 public class InitializeGameData {
     private int initRoll;
     private List<Player> players;
-    private boolean botGame;
+    private boolean eliminationGame;
+    private boolean creditGame;
 }

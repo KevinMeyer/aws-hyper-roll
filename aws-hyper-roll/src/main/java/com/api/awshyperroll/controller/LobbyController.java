@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.api.awshyperroll.model.EmailDetails;
 import com.api.awshyperroll.model.Game;
 import com.api.awshyperroll.model.InitializeGameData;
+import com.api.awshyperroll.model.JoinResponse;
 import com.api.awshyperroll.model.LobbyIds;
 import com.api.awshyperroll.model.Player;
 import com.api.awshyperroll.model.PollingResponse;
-import com.api.awshyperroll.service.EmailService;
 import com.api.awshyperroll.service.GameService;
 import com.api.awshyperroll.service.LobbyService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,20 +36,8 @@ public class LobbyController {
     @Autowired
     private GameService gameService;
 
-    @Autowired 
-    private EmailService emailService;
-
-    @PostMapping("/sendEmail")
-    public void testEmail(@RequestBody EmailDetails details){
-        try {
-            emailService.sendSimpleMail(details);
-        } catch (Exception e) {
-            LOGGER.error("Email didnt work", e);
-        }
-    }
-    
     @PostMapping("/lobby")
-    public LobbyIds createLobby (@RequestBody InitializeGameData gameData) {
+    public JoinResponse createLobby (@RequestBody InitializeGameData gameData) {
         LOGGER.info("Begin createLobby...");
         try {
             // Create the new lobby and store in database            
@@ -68,7 +55,7 @@ public class LobbyController {
     }
    
     @PatchMapping("/lobby/join/{lobbyCode}")
-    public LobbyIds joinLobby ( @PathVariable String lobbyCode,
+    public JoinResponse joinLobby ( @PathVariable String lobbyCode,
                                 @RequestBody Player player ) {
 
         LOGGER.info("Begin joining Lobby...");
@@ -141,14 +128,13 @@ public class LobbyController {
            
             // Set data to create new game
             InitializeGameData gameData = new InitializeGameData();
-            gameData.setBotGame(false);
             gameData.setInitRoll(currentGame.getInitialRoll());
-            gameData.setPlayers(new ArrayList<>(currentGame.getPlayers()));
-            
+            gameData.setEliminationGame(currentGame.isEliminationGame());
+            gameData.setPlayers(new ArrayList<>(currentGame.getInitPlayers().values()));
+
             //Create the new game
             String initMessage = "Game Reset! Starting Roll:" + currentGame.getInitialRoll();
-            Game newGame = gameService.createGame(gameData, lobbyIds.getLobbyId(), initMessage);
-
+            Game newGame = gameService.resetGame(gameData, currentGame, lobbyIds.getLobbyId(), initMessage);
             // Update lobby to point at new game
             lobbyService.updateLobbyGame(lobbyIds.getLobbyId(), newGame.getGameId());
             LOGGER.info("Set lobby to game_id: " + newGame.getGameId());
