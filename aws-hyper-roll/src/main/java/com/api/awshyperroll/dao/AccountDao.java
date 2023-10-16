@@ -1,5 +1,7 @@
 package com.api.awshyperroll.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,6 +21,8 @@ import io.micrometer.common.util.StringUtils;
 
 @Repository
 public class AccountDao {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountDao.class);
+
    
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -131,22 +135,26 @@ public class AccountDao {
         if (!StringUtils.isEmpty(loginRequest.getLoginToken())
                 && !StringUtils.isEmpty(loginRequest.getAccountId())) {
             successfulLogin = checkTokenLogin(loginRequest);
-            if (successfulLogin){
-                account = getAccountById(loginRequest.getAccountId());
+            LOGGER.info("Cached login success ");
+            if (!successfulLogin){
+                LOGGER.info("Validated cached login session!");
                 response.setErrMsg("Your session expired. Please login again.");
             } 
         } 
         //Password Login
         if (!StringUtils.isEmpty(loginRequest.getPassword())
                 && !StringUtils.isEmpty(loginRequest.getEmail())) {
+            LOGGER.info("Validating login credentials...");
             successfulLogin = checkPasswordLogin(loginRequest);
-            if (successfulLogin){
-                account = getAccountByEmail(loginRequest.getEmail());
+            if (!successfulLogin){
+                LOGGER.info("Validated login credentials!");
                 response.setErrMsg("Your session expired. Please login again.");
             }
         }
         if (successfulLogin) {
             response.setSuccess(true);
+            account = getAccountByEmail(loginRequest.getEmail());
+            
             response.setAccountId(account.getAccountId());
             String loginToken = baseDao.getUUID();
             updateLoginToken(loginToken);
@@ -155,7 +163,7 @@ public class AccountDao {
         } else {
             response.setSuccess(false);
         }
-    
+        LOGGER.info(response.toString());
         return response;
     }
 
